@@ -1,0 +1,6 @@
+node_modules/
+dist/
+coverage/
+adaptive-reports/
+*.tsbuildinfo
+.turbo/

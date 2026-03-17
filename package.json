@@ -1,0 +1,43 @@
+{
+  "name": "adaptive",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Vite-native build intelligence for device-aware bundle optimization",
+  "scripts": {
+    "build": "turbo run build",
+    "test": "turbo run test",
+    "lint": "turbo run lint",
+    "typecheck": "turbo run typecheck",
+    "clean": "turbo run clean",
+    "size-check": "node scripts/size-check.mjs",
+    "prepare": "husky"
+  },
+  "devDependencies": {
+    "@testing-library/jest-dom": "^6.9.1",
+    "@testing-library/react": "^16.3.2",
+    "@typescript-eslint/eslint-plugin": "^8.0.0",
+    "@typescript-eslint/parser": "^8.0.0",
+    "eslint": "^8.57.0",
+    "jsdom": "^29.0.0",
+    "prettier": "^3.3.0",
+    "tsup": "^8.0.0",
+    "turbo": "^2.0.0",
+    "typescript": "^5.5.0",
+    "husky": "^9.0.0",
+    "lint-staged": "^15.0.0",
+    "vitest": "^2.0.0"
+  },
+  "lint-staged": {
+    "*.{ts,tsx}": [
+      "eslint --fix",
+      "prettier --write"
+    ],
+    "*.{json,md,yml}": [
+      "prettier --write"
+    ]
+  },
+  "packageManager": "pnpm@9.15.0",
+  "engines": {
+    "node": ">=18"
+  }
+}
