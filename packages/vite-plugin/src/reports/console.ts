@@ -1,14 +1,13 @@
 import type { BoundaryAnalysis } from '../types.js';
 
-function formatKB(bytes: number): string {
+function fmtKB(bytes: number): string {
   const kb = bytes / 1024;
   if (kb >= 1024) return `${(kb / 1024).toFixed(1)}MB`;
-  if (kb >= 100) return `${Math.round(kb)}KB`;
   if (kb >= 10) return `${Math.round(kb)}KB`;
   return `${kb.toFixed(1)}KB`;
 }
 
-function formatDeps(deps: { id: string; size: number }[]): string {
+function fmtDeps(deps: { id: string; size: number }[]): string {
   if (deps.length === 0) return '(none)';
   const names = deps
     .sort((a, b) => b.size - a.size)
@@ -18,43 +17,38 @@ function formatDeps(deps: { id: string; size: number }[]): string {
   return `(${names.join(', ')}${suffix})`;
 }
 
-function formatBoundary(analysis: BoundaryAnalysis, index: number): string {
-  const { boundary, highSize, lowSize, savings, savingsPercent } = analysis;
-  const name = boundary.name;
-  const loc = `${boundary.filePath}:${boundary.line}`;
-  const highLabel = formatKB(highSize);
-  const lowLabel = formatKB(lowSize);
-  const savingsLabel = formatKB(savings);
-  const pct = savingsPercent.toFixed(1);
+function fmtBoundary(a: BoundaryAnalysis, i: number): string {
+  const loc = `${a.boundary.filePath}:${a.boundary.line}`;
+  const h = fmtKB(a.highSize).padStart(7);
+  const l = fmtKB(a.lowSize).padStart(7);
+  const s = fmtKB(a.savings);
+  const pct = a.savingsPercent.toFixed(1);
 
-  const lines = [
-    `  ${index + 1}. ${name} (${loc})`,
-    `     \u251C\u2500 high: ${highLabel.padStart(6)} ${formatDeps(analysis.exclusiveHighDeps)}`,
-    `     \u251C\u2500 low:  ${lowLabel.padStart(6)} ${formatDeps(analysis.exclusiveLowDeps)}`,
-    `     \u2514\u2500 Savings for low-tier: ${savingsLabel} (${pct}%)`,
-  ];
-  return lines.join('\n');
+  return [
+    `  ${i + 1}. ${a.boundary.name} (${loc})`,
+    `     \u251C\u2500 high: ${h} ${fmtDeps(a.exclusiveHighDeps)}`,
+    `     \u251C\u2500 low:  ${l} ${fmtDeps(a.exclusiveLowDeps)}`,
+    `     \u2514\u2500 Savings for low-tier: ${s} (${pct}%)`,
+  ].join('\n');
 }
 
 function computeTotals(analyses: BoundaryAnalysis[]) {
-  let totalHigh = 0;
-  let totalLow = 0;
-  let totalSavings = 0;
-
+  let high = 0,
+    low = 0,
+    savings = 0;
   for (const a of analyses) {
     const shared = a.sharedDeps.reduce((s, d) => s + d.size, 0);
-    totalHigh += a.highSize + shared;
-    totalLow += a.lowSize + shared;
-    totalSavings += a.savings;
+    high += a.highSize + shared;
+    low += a.lowSize + shared;
+    savings += a.savings;
   }
-
-  return { totalHigh, totalLow, totalSavings };
+  return { high, low, savings };
 }
 
-export function formatConsoleReport(analyses: BoundaryAnalysis[]): string {
+export function formatConsoleReport(analyses: BoundaryAnalysis[], extra?: string): string {
   const sep = '\u2550'.repeat(55);
-  const { totalHigh, totalLow, totalSavings } = computeTotals(analyses);
-  const reductionPct = totalHigh > 0 ? ((totalSavings / totalHigh) * 100).toFixed(1) : '0.0';
+  const { high, low, savings } = computeTotals(analyses);
+  const pct = high > 0 ? ((savings / high) * 100).toFixed(1) : '0.0';
 
   const lines = [
     '',
@@ -65,16 +59,21 @@ export function formatConsoleReport(analyses: BoundaryAnalysis[]): string {
   ];
 
   for (let i = 0; i < analyses.length; i++) {
-    lines.push(formatBoundary(analyses[i], i));
+    lines.push(fmtBoundary(analyses[i], i));
     if (i < analyses.length - 1) lines.push('');
   }
 
   lines.push('');
-  lines.push(`Total potential savings: ${formatKB(totalSavings)} for low-tier devices`);
-  lines.push(`Total bundle (high-tier): ${formatKB(totalHigh)}`);
-  lines.push(`Total bundle (low-tier):  ${formatKB(totalLow)} (${reductionPct}% reduction)`);
+  lines.push(`Total potential savings: ${fmtKB(savings)} for low-tier devices`);
+  lines.push(`Total bundle (high-tier): ${fmtKB(high)}`);
+  lines.push(`Total bundle (low-tier):  ${fmtKB(low)} (${pct}% reduction)`);
   lines.push(sep);
-  lines.push('');
 
+  if (extra) {
+    lines.push('');
+    lines.push(extra);
+  }
+
+  lines.push('');
   return lines.join('\n');
 }

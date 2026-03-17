@@ -31,3 +31,5 @@ export function analyzeBoundaries(
 
 export { scanSource } from './scanner.js';
 export { analyzeBoundary } from './dependencies.js';
+export { findOpportunities } from './opportunities.js';
+export type { Opportunity } from './opportunities.js';

@@ -1,7 +1,7 @@
 import type { AdaptivePluginConfig, ResolvedConfig } from './types.js';
 
 const DEFAULTS: ResolvedConfig = {
-  analysisSizeThreshold: 50,
+  analysisSizeThreshold: 1024,
   report: true,
   reportFormat: 'console',
   reportDir: './adaptive-reports',

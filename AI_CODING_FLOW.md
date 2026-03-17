@@ -78,3 +78,65 @@ This document tracks all user requests and AI outputs during development, servin
 - **Bug #2 fixed:** Added `resolveImportId()` in `dependencies.ts` — scanner extracts relative paths but Rollup uses absolute module IDs, now resolves with extension matching
 - Updated `dependencies.test.ts` to pass `moduleIds` set (was passing empty set)
 - All 132 tests pass, build produces proper `adaptive-*-high/low` chunk names, verify script confirms no heavy content leaks into low chunks
+
+### #010 — Phase 2 Planning (Framework Expansion)
+
+**Date:** 2026-03-17
+**Request:** Plan Phase 2 implementation — `@adaptive/vue` and `@adaptive/svelte` adapters. Analyze React adapter patterns, map to Vue/Svelte equivalents, design file structures, check scanner compatibility, propose implementation order.
+**Output:**
+
+- Analyzed React adapter (6 files, ~421 lines): adaptive() factory, AdaptiveProvider, Adaptive.High/Low inline, 4 hooks, error-recovery
+- Mapped API surface to Vue (defineAsyncComponent, provide/inject, composables) and Svelte (readable stores, context API)
+- Designed file structure: Vue 6 src + 5 test files, Svelte 5 src + 4 test files — all under 200-line limit
+- Confirmed vite-plugin scanner needs NO changes — Vue/Svelte SFCs are pre-transformed to JS before Rollup hooks run
+- Confirmed @adaptive/core needs NO changes — server.ts already sufficient
+- Identified parallelization: Vue and Svelte implementation are fully independent, can run concurrently
+- Identified risk areas: defineAsyncComponent error semantics, Svelte store eager vs lazy evaluation, Svelte 4 vs 5 compat
+- Proposed 7-step execution plan with agent assignments
+- Size budgets from SPEC: Vue <2KB gzipped, Svelte <1.5KB gzipped
+- Total estimate: ~1,340 lines across 31 new files
+
+### #011 — Phase 2 Implementation (Vue + Svelte Adapters)
+
+**Date:** 2026-03-17
+**Request:** Implement `@adaptive/vue` and `@adaptive/svelte` adapters using parallel agent teams.
+**Output:**
+
+- **@adaptive/vue** (6 src files, 4 test files):
+  - `adaptive.ts` — `adaptive()` factory using `defineAsyncComponent` with tier-based import selection (172 lines)
+  - `composables.ts` — `useAdaptive()`, `useTier()`, `useDeviceProfile()`, `useNetworkAware()`
+  - `context.ts` — `AdaptiveProvider` using Vue provide/inject
+  - `inline.ts` — `AdaptiveHigh`, `AdaptiveLow`, `AdaptiveMedium` render-function components
+  - `error-recovery.ts` — retry/fallback adapted for Vue Component types
+  - 20 tests passing, **1161 bytes gzipped** (under 2KB budget)
+- **@adaptive/svelte** (5 src files, 3 test files):
+  - `adaptive.ts` — `adaptive()` returns `Readable<T | null>` store, lazily loads on first subscription
+  - `stores.ts` — factory functions + singleton stores for tier, profile, network awareness
+  - `context.ts` — `setAdaptiveContext()`/`getAdaptiveContext()` using Svelte context API
+  - `error-recovery.ts` — generic retry/fallback (no framework types)
+  - 13 tests passing, **760 bytes gzipped** (under 1.5KB budget)
+- Scanner confirmed no changes needed — Vue/Svelte SFCs pre-transformed before `buildEnd`
+- All **165 tests** pass across 5 packages (core: 60, react: 19, vite-plugin: 53, vue: 20, svelte: 13)
+
+### #012 — Phase 3 Implementation (Next.js + Nuxt Meta-Framework Integration)
+
+**Date:** 2026-03-18
+**Request:** Implement `@adaptive/next` (Next.js Webpack integration) and `@adaptive/nuxt` (Nuxt module wrapping Vite plugin + Nitro middleware).
+**Output:**
+
+- **@adaptive/next** (6 src files, 4 test files):
+  - `with-adaptive.ts` — Config wrapper injects Webpack plugin for production client builds, chains user webpack config
+  - `webpack/plugin.ts` — Webpack plugin class: hooks `thisCompilation` → `afterOptimizeModules`, runs analysis engine, applies splitChunks
+  - `webpack/module-graph-adapter.ts` — Adapts `compilation.modules` to `ModuleGraph` interface (reuses vite-plugin analysis)
+  - `webpack/split-chunks.ts` — Converts `BoundaryAnalysis[]` to `splitChunks.cacheGroups` config
+  - `types.ts` — Webpack/Next.js type definitions
+  - 25 tests passing
+- **@adaptive/nuxt** (4 src files, 2 test files):
+  - `module.ts` — `defineAdaptiveModule()`: injects Vite plugin via `vite:extendConfig` hook, registers Nitro middleware
+  - `nitro-middleware.ts` — `createAdaptiveMiddleware()`: resolves tier from Client Hints headers, sets `adaptive_tier_hint` cookie
+  - `types.ts` — Nuxt-specific config extending `AdaptivePluginConfig` with `clientHints`, `cookieName`, `cookieMaxAge`
+  - 13 tests passing
+- Added `scanAllModules`, `analyzeBoundaries`, `findOpportunities`, `ModuleGraph`, `ModuleInfo` exports to `@adaptive/vite-plugin`
+- Updated `CLAUDE.md` architecture reference, `README.md` with Next.js and Nuxt setup examples
+- All **209 tests** pass across 7 packages (core: 60, vite-plugin: 59, react: 19, vue: 20, svelte: 13, next: 25, nuxt: 13)
+- Key architecture: **reuse over duplication** — Next.js package imports analysis engine from vite-plugin, only chunk isolation is Webpack-specific

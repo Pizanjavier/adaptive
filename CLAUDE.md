@@ -6,7 +6,7 @@
 
 Adaptive is a Vite-native build intelligence tool for device-aware bundle optimization. It analyzes, splits, and serves optimized bundles based on device capabilities. Monorepo with packages: `core`, `vite-plugin`, `react`, `vue`, `svelte`, `next`, `nuxt`, `devtools`.
 
-**Current phase:** Phase 1 (Foundation) — `@adaptive/core` + `@adaptive/react` + `@adaptive/vite-plugin`
+**Current phase:** Phase 3 (Meta-Frameworks) — `@adaptive/next` + `@adaptive/nuxt`
 
 ## Architecture Quick Reference
 
@@ -15,6 +15,10 @@ packages/
   core/          → Detection engine, scoring, tier resolution (~3KB gzipped, ZERO deps)
   vite-plugin/   → Build analysis, chunk splitting, CLI, reports (dev dep)
   react/         → adaptive() + Adaptive.High/Low + hooks (depends on core)
+  vue/           → adaptive() + composables + AdaptiveHigh/Low (depends on core)
+  svelte/        → adaptive() + stores + context (depends on core)
+  next/          → withAdaptive() + Webpack plugin (depends on vite-plugin for analysis)
+  nuxt/          → defineAdaptiveModule() + Nitro middleware (depends on vite-plugin)
 ```
 
 **Stack:** TypeScript strict, pnpm workspaces + turborepo, tsup/unbuild, vitest, eslint, prettier

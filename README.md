@@ -14,7 +14,14 @@ No production-grade tooling exists for adaptive loading. Google Chrome Labs vali
 
 ```bash
 pnpm add -D @adaptive/vite-plugin
-pnpm add @adaptive/react @adaptive/core
+pnpm add @adaptive/core
+
+# Pick your framework adapter:
+pnpm add @adaptive/react    # React 18+
+pnpm add @adaptive/vue      # Vue 3.3+
+pnpm add @adaptive/svelte   # Svelte 4+
+pnpm add @adaptive/next     # Next.js 13+
+pnpm add @adaptive/nuxt     # Nuxt 3+
 ```
 
 ## Level 0: Plugin Setup (zero code changes)
@@ -81,6 +88,38 @@ function Dashboard() {
     </div>
   );
 }
+```
+
+### Vue
+
+```vue
+<script setup>
+import { adaptive } from '@adaptive/vue';
+
+const MapView = adaptive({
+  high: () => import('./MapboxMap.vue'),
+  low: () => import('./StaticMap.vue'),
+});
+</script>
+
+<template>
+  <component :is="MapView" :center="[40, -3]" :zoom="12" />
+</template>
+```
+
+### Svelte
+
+```svelte
+<script>
+import { adaptive } from '@adaptive/svelte';
+
+const MapView = adaptive({
+  high: () => import('./MapboxMap.svelte'),
+  low: () => import('./StaticMap.svelte'),
+});
+</script>
+
+<svelte:component this={$MapView} center={[40, -3]} zoom={12} />
 ```
 
 ## Hooks
@@ -162,6 +201,38 @@ adaptive({
 });
 ```
 
+## Next.js
+
+```ts
+// next.config.js
+const { withAdaptive } = require('@adaptive/next');
+
+module.exports = withAdaptive({
+  adaptive: {
+    report: true,
+    reportFormat: 'console',
+  },
+  // ...rest of your Next.js config
+});
+```
+
+The Webpack plugin runs analysis at build time (production only, client-side) using the same analysis engine as the Vite plugin. It creates `splitChunks.cacheGroups` to isolate tier-specific code.
+
+## Nuxt
+
+```ts
+// nuxt.config.ts
+export default defineNuxtConfig({
+  modules: ['@adaptive/nuxt'],
+  adaptive: {
+    report: true,
+    clientHints: true, // auto-injects Nitro middleware for Client Hints
+  },
+});
+```
+
+The Nuxt module auto-injects the Vite plugin and registers server middleware that resolves device tier from Client Hints headers and sets an `adaptive_tier_hint` cookie.
+
 ## Architecture
 
 ```
@@ -169,6 +240,10 @@ packages/
   core/          @adaptive/core           Detection + scoring (~3KB gzipped, zero deps)
   vite-plugin/   @adaptive/vite-plugin    Build analysis, chunk splitting, CLI, reports
   react/         @adaptive/react          adaptive() + hooks + Adaptive.High/Low
+  vue/           @adaptive/vue            adaptive() + composables + AdaptiveHigh/Low
+  svelte/        @adaptive/svelte         adaptive() + stores + context
+  next/          @adaptive/next           Next.js Webpack plugin (reuses vite-plugin analysis)
+  nuxt/          @adaptive/nuxt           Nuxt module + Nitro middleware
 ```
 
 ## Development
@@ -183,10 +258,12 @@ pnpm lint
 
 ## Size Budgets
 
-| Package           | Budget      | Enforced     |
-| ----------------- | ----------- | ------------ |
-| `@adaptive/core`  | 3KB gzipped | CI blocks PR |
-| `@adaptive/react` | 2KB gzipped | CI blocks PR |
+| Package            | Budget        | Enforced     |
+| ------------------ | ------------- | ------------ |
+| `@adaptive/core`   | 3KB gzipped   | CI blocks PR |
+| `@adaptive/react`  | 2KB gzipped   | CI blocks PR |
+| `@adaptive/vue`    | 2KB gzipped   | CI blocks PR |
+| `@adaptive/svelte` | 1.5KB gzipped | CI blocks PR |
 
 ## License
 

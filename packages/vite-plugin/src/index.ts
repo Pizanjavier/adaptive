@@ -1,7 +1,8 @@
 import type { Plugin } from 'vite';
 import type { AdaptivePluginConfig, BoundaryAnalysis } from './types.js';
 import { normalizeConfig } from './config.js';
-import { scanAllModules, analyzeBoundaries } from './analysis/index.js';
+import { scanAllModules, analyzeBoundaries, findOpportunities } from './analysis/index.js';
+import type { Opportunity } from './analysis/opportunities.js';
 import { createManualChunks } from './chunks/index.js';
 import { createPreloadHtmlTransform } from './preload.js';
 import { transformForTargetTier } from './target-tier.js';
@@ -23,6 +24,7 @@ import { checkBudgets } from './budget.js';
 export function adaptive(userConfig?: AdaptivePluginConfig): Plugin {
   const config = normalizeConfig(userConfig);
   let analyses: BoundaryAnalysis[] = [];
+  let opportunities: Opportunity[] = [];
 
   return {
     name: 'adaptive',
@@ -55,6 +57,7 @@ export function adaptive(userConfig?: AdaptivePluginConfig): Plugin {
       };
       const boundaries = scanAllModules(graph as never);
       analyses = analyzeBoundaries(boundaries, graph as never, config.sizeOverrides);
+      opportunities = findOpportunities(graph as never, boundaries, config);
     },
 
     transform(code, id) {
@@ -67,9 +70,9 @@ export function adaptive(userConfig?: AdaptivePluginConfig): Plugin {
     },
 
     closeBundle() {
-      if (analyses.length === 0) return;
+      if (analyses.length === 0 && opportunities.length === 0) return;
 
-      generateReports(analyses, config);
+      generateReports(analyses, config, opportunities);
 
       if (config.budget) {
         const result = checkBudgets(analyses, config.budget);
@@ -96,10 +99,15 @@ export type {
   AdaptiveBoundary,
   BudgetConfig,
   ResolvedConfig,
+  ModuleGraph,
+  ModuleInfo,
 } from './types.js';
 
 export { normalizeConfig } from './config.js';
 export { scanSource } from './analysis/scanner.js';
+export { scanAllModules, analyzeBoundaries } from './analysis/index.js';
+export { findOpportunities } from './analysis/opportunities.js';
+export type { Opportunity } from './analysis/opportunities.js';
 export { createManualChunks } from './chunks/index.js';
 export { generateReports } from './reports/index.js';
 export { checkBudgets } from './budget.js';
