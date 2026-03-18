@@ -1,4 +1,4 @@
-import { useTier, useAdaptive } from '@adaptive/react';
+import { useTier, useAdaptive } from '@adaptive-bundle/react';
 
 export function TierIndicator() {
   const tier = useTier();

@@ -7,5 +7,5 @@ export default defineConfig({
   clean: true,
   treeshake: true,
   minify: true,
-  external: ['react', 'react-dom', '@adaptive/core'],
+  external: ['react', 'react-dom', '@adaptive-bundle/core'],
 });

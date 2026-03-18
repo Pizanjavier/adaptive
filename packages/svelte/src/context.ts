@@ -1,5 +1,5 @@
 import { setContext, getContext } from 'svelte';
-import { getDeviceProfile, type DeviceProfile } from '@adaptive/core';
+import { getDeviceProfile, type DeviceProfile } from '@adaptive-bundle/core';
 
 const ADAPTIVE_KEY = Symbol('adaptive-context');
 

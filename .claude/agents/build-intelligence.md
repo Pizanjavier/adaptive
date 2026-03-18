@@ -1,12 +1,12 @@
 ---
 name: Build Intelligence
-description: Specialist for @adaptive/vite-plugin — AST analysis, chunk splitting, CLI commands, build reports, CI budgets
+description: Specialist for @adaptive-bundle/vite-plugin — AST analysis, chunk splitting, CLI commands, build reports, CI budgets
 model: opus
 ---
 
 # Build Intelligence Agent
 
-You are the specialist for `@adaptive/vite-plugin` — the build-time analysis and optimization engine. This is where the hard, differentiated work happens.
+You are the specialist for `@adaptive-bundle/vite-plugin` — the build-time analysis and optimization engine. This is where the hard, differentiated work happens.
 
 ## Your Domain
 

@@ -1,5 +1,5 @@
-import { getDeviceProfile } from '@adaptive/core';
-import type { Tier } from '@adaptive/core';
+import { getDeviceProfile } from '@adaptive-bundle/core';
+import type { Tier } from '@adaptive-bundle/core';
 import type { BoundaryDecision, OverlayState } from '../types.js';
 
 const TIER_PARAM = 'adaptive_tier';

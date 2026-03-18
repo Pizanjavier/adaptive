@@ -5,8 +5,8 @@ import {
   findOpportunities,
   generateReports,
   checkBudgets,
-} from '@adaptive/vite-plugin';
-import type { BoundaryAnalysis, Opportunity } from '@adaptive/vite-plugin';
+} from '@adaptive-bundle/vite-plugin';
+import type { BoundaryAnalysis, Opportunity } from '@adaptive-bundle/vite-plugin';
 import type { NextAdaptiveConfig, WebpackCompiler, WebpackCompilation } from '../types.js';
 import { createModuleGraphAdapter } from './module-graph-adapter.js';
 import { buildCacheGroups } from './split-chunks.js';

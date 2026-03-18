@@ -4,7 +4,7 @@ import { gzipSync } from 'node:zlib';
 import { resolve } from 'node:path';
 
 describe('size budget', () => {
-  it('@adaptive/vue is under 2KB gzipped', () => {
+  it('@adaptive-bundle/vue is under 2KB gzipped', () => {
     const distPath = resolve(__dirname, '../dist/index.js');
     const content = readFileSync(distPath);
     const gzipped = gzipSync(content);

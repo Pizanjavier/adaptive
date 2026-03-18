@@ -89,7 +89,7 @@ function cleanupAdaptiveImport(source: string): string {
   const inlineUsed = /\bAdaptive\./.test(source);
 
   return source.replace(
-    /import\s+\{([^}]*)\}\s+from\s+['"](@adaptive\/(?:react|vue|svelte))['"];?\n?/g,
+    /import\s+\{([^}]*)\}\s+from\s+['"](@adaptive-bundle\/(?:react|vue|svelte))['"];?\n?/g,
     (_match, specifiers: string, pkg: string) => {
       const names = specifiers
         .split(',')

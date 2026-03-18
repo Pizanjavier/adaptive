@@ -24,10 +24,10 @@ for (const [pkg, maxBytes] of Object.entries(budgets)) {
   const size = gzipped.length;
 
   if (size > maxBytes) {
-    console.error(`❌ @adaptive/${pkg}: ${size} bytes gzipped (budget: ${maxBytes})`);
+    console.error(`❌ @adaptive-bundle/${pkg}: ${size} bytes gzipped (budget: ${maxBytes})`);
     failed = true;
   } else {
-    console.log(`✅ @adaptive/${pkg}: ${size} bytes gzipped (budget: ${maxBytes})`);
+    console.log(`✅ @adaptive-bundle/${pkg}: ${size} bytes gzipped (budget: ${maxBytes})`);
   }
 }
 

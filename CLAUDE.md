@@ -6,7 +6,7 @@
 
 Adaptive is a Vite-native build intelligence tool for device-aware bundle optimization. It analyzes, splits, and serves optimized bundles based on device capabilities. Monorepo with packages: `core`, `vite-plugin`, `react`, `vue`, `svelte`, `next`, `nuxt`, `devtools`.
 
-**Current phase:** Phase 3 (Meta-Frameworks) — `@adaptive/next` + `@adaptive/nuxt`
+**Current phase:** Phase 3 (Meta-Frameworks) — `@adaptive-bundle/next` + `@adaptive-bundle/nuxt`
 
 ## Architecture Quick Reference
 
@@ -32,7 +32,7 @@ packages/
 
 ### Performance
 
-- `@adaptive/core` must stay under **3KB gzipped**. Every byte matters.
+- `@adaptive-bundle/core` must stay under **3KB gzipped**. Every byte matters.
 - Detection must complete in **<50ms** on any device.
 - Zero runtime dependencies in core. None. Ever.
 - No polyfills, no shims, no string tables, no lookup maps.
@@ -72,7 +72,7 @@ Use `.claude/agents/` for specialized tasks. Available agents:
 | Agent                   | Purpose                                                                  |
 | ----------------------- | ------------------------------------------------------------------------ |
 | `architect.md`          | Orchestrates complex tasks, plans architecture, coordinates other agents |
-| `core-engine.md`        | Detection, scoring, probes, tier resolution in `@adaptive/core`          |
+| `core-engine.md`        | Detection, scoring, probes, tier resolution in `@adaptive-bundle/core`   |
 | `build-intelligence.md` | Vite plugin, AST analysis, chunk splitting, CLI, reports                 |
 | `react-adapter.md`      | React adapter, adaptive() API, hooks, Suspense integration               |
 | `quality-guardian.md`   | Testing, size budgets, CI checks, linting, validation                    |

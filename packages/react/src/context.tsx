@@ -1,5 +1,5 @@
 import { createContext, useContext, useState, useEffect, type ReactNode } from 'react';
-import { getDeviceProfile, type DeviceProfile } from '@adaptive/core';
+import { getDeviceProfile, type DeviceProfile } from '@adaptive-bundle/core';
 
 export const AdaptiveContext = createContext<DeviceProfile | null>(null);
 

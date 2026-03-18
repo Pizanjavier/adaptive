@@ -1,5 +1,8 @@
 {
-  "name": "@adaptive/nuxt",
+  "name": "@adaptive-bundle/nuxt",
+  "publishConfig": {
+    "access": "public"
+  },
   "version": "0.1.0",
   "description": "Nuxt module for Adaptive — auto-injects Vite plugin + Nitro middleware",
   "type": "module",
@@ -29,13 +32,13 @@
     "clean": "rm -rf dist"
   },
   "peerDependencies": {
-    "@adaptive/core": "workspace:*",
-    "@adaptive/vite-plugin": "workspace:*",
+    "@adaptive-bundle/core": "workspace:*",
+    "@adaptive-bundle/vite-plugin": "workspace:*",
     "nuxt": ">=3.0.0"
   },
   "devDependencies": {
-    "@adaptive/core": "workspace:*",
-    "@adaptive/vite-plugin": "workspace:*"
+    "@adaptive-bundle/core": "workspace:*",
+    "@adaptive-bundle/vite-plugin": "workspace:*"
   },
   "sideEffects": false
 }

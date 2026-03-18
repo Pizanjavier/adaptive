@@ -7,5 +7,5 @@ export default defineConfig({
   clean: true,
   treeshake: true,
   minify: true,
-  external: ['svelte', 'svelte/store', '@adaptive/core'],
+  external: ['svelte', 'svelte/store', '@adaptive-bundle/core'],
 });

@@ -6,5 +6,5 @@ export default defineConfig({
   dts: true,
   clean: true,
   treeshake: true,
-  external: ['nuxt', '@nuxt/kit', '@adaptive/core', '@adaptive/vite-plugin', 'h3'],
+  external: ['nuxt', '@nuxt/kit', '@adaptive-bundle/core', '@adaptive-bundle/vite-plugin', 'h3'],
 });

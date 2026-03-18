@@ -1,5 +1,8 @@
 {
-  "name": "@adaptive/core",
+  "name": "@adaptive-bundle/core",
+  "publishConfig": {
+    "access": "public"
+  },
   "version": "0.1.0",
   "description": "Device detection engine, scoring, and tier resolution",
   "type": "module",

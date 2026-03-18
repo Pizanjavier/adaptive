@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { buildCacheGroups } from '../src/webpack/split-chunks.js';
-import type { BoundaryAnalysis } from '@adaptive/vite-plugin';
+import type { BoundaryAnalysis } from '@adaptive-bundle/vite-plugin';
 
 function createAnalysis(overrides: Partial<BoundaryAnalysis> = {}): BoundaryAnalysis {
   return {

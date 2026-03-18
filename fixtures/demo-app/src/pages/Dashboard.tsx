@@ -1,5 +1,5 @@
 import { Suspense } from 'react';
-import { Adaptive } from '@adaptive/react';
+import { Adaptive } from '@adaptive-bundle/react';
 import Metrics from '../components/dashboard/Metrics';
 import Chart from '../components/dashboard/Chart';
 

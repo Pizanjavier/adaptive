@@ -4,7 +4,7 @@ import {
   type DeviceProfile,
   type Tier,
   type EffectiveType,
-} from '@adaptive/core';
+} from '@adaptive-bundle/core';
 import { useAdaptiveContext } from './context.js';
 
 function getProfile(ctx: DeviceProfile | null): DeviceProfile {

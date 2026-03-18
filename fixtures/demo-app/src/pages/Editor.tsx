@@ -1,5 +1,5 @@
 import { Suspense } from 'react';
-import { Adaptive } from '@adaptive/react';
+import { Adaptive } from '@adaptive-bundle/react';
 import EditorBoundary from '../components/editor/EditorBoundary';
 
 export default function EditorPage() {

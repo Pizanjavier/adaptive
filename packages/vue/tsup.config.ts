@@ -7,5 +7,5 @@ export default defineConfig({
   clean: true,
   treeshake: true,
   minify: true,
-  external: ['vue', '@adaptive/core'],
+  external: ['vue', '@adaptive-bundle/core'],
 });

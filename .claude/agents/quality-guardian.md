@@ -20,13 +20,13 @@ You are the quality enforcer for the Adaptive project. You ensure every package 
 
 ## Size Budgets (STRICT)
 
-| Package              | Max Gzipped | Enforcement  |
-| -------------------- | ----------- | ------------ |
-| `@adaptive/core`     | 3KB         | CI blocks PR |
-| `@adaptive/react`    | 2KB         | CI blocks PR |
-| `@adaptive/vue`      | 2KB         | CI blocks PR |
-| `@adaptive/svelte`   | 1.5KB       | CI blocks PR |
-| `@adaptive/devtools` | 15KB        | CI warns     |
+| Package                     | Max Gzipped | Enforcement  |
+| --------------------------- | ----------- | ------------ |
+| `@adaptive-bundle/core`     | 3KB         | CI blocks PR |
+| `@adaptive-bundle/react`    | 2KB         | CI blocks PR |
+| `@adaptive-bundle/vue`      | 2KB         | CI blocks PR |
+| `@adaptive-bundle/svelte`   | 1.5KB       | CI blocks PR |
+| `@adaptive-bundle/devtools` | 15KB        | CI warns     |
 
 ## Testing Strategy
 

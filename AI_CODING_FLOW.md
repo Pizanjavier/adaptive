@@ -46,8 +46,8 @@ This document tracks all user requests and AI outputs during development, servin
 **Request:** Size enforcement tests, TypeScript audit, JSDoc on public APIs, README update.
 **Output:**
 
-- Created `packages/core/tests/size.test.ts` — enforces @adaptive/core under 3KB gzipped
-- Created `packages/react/tests/size.test.ts` — enforces @adaptive/react under 2KB gzipped
+- Created `packages/core/tests/size.test.ts` — enforces @adaptive-bundle/core under 3KB gzipped
+- Created `packages/react/tests/size.test.ts` — enforces @adaptive-bundle/react under 2KB gzipped
 - TypeScript audit: no `any` in public interfaces, all public functions have explicit return types
 - Added `@example` JSDoc to all main public exports across core, react, vite-plugin
 - Updated `README.md` with installation, all 3 API forms, hooks, config, server-side, testing, CLI options
@@ -82,14 +82,14 @@ This document tracks all user requests and AI outputs during development, servin
 ### #010 — Phase 2 Planning (Framework Expansion)
 
 **Date:** 2026-03-17
-**Request:** Plan Phase 2 implementation — `@adaptive/vue` and `@adaptive/svelte` adapters. Analyze React adapter patterns, map to Vue/Svelte equivalents, design file structures, check scanner compatibility, propose implementation order.
+**Request:** Plan Phase 2 implementation — `@adaptive-bundle/vue` and `@adaptive-bundle/svelte` adapters. Analyze React adapter patterns, map to Vue/Svelte equivalents, design file structures, check scanner compatibility, propose implementation order.
 **Output:**
 
 - Analyzed React adapter (6 files, ~421 lines): adaptive() factory, AdaptiveProvider, Adaptive.High/Low inline, 4 hooks, error-recovery
 - Mapped API surface to Vue (defineAsyncComponent, provide/inject, composables) and Svelte (readable stores, context API)
 - Designed file structure: Vue 6 src + 5 test files, Svelte 5 src + 4 test files — all under 200-line limit
 - Confirmed vite-plugin scanner needs NO changes — Vue/Svelte SFCs are pre-transformed to JS before Rollup hooks run
-- Confirmed @adaptive/core needs NO changes — server.ts already sufficient
+- Confirmed @adaptive-bundle/core needs NO changes — server.ts already sufficient
 - Identified parallelization: Vue and Svelte implementation are fully independent, can run concurrently
 - Identified risk areas: defineAsyncComponent error semantics, Svelte store eager vs lazy evaluation, Svelte 4 vs 5 compat
 - Proposed 7-step execution plan with agent assignments
@@ -99,17 +99,17 @@ This document tracks all user requests and AI outputs during development, servin
 ### #011 — Phase 2 Implementation (Vue + Svelte Adapters)
 
 **Date:** 2026-03-17
-**Request:** Implement `@adaptive/vue` and `@adaptive/svelte` adapters using parallel agent teams.
+**Request:** Implement `@adaptive-bundle/vue` and `@adaptive-bundle/svelte` adapters using parallel agent teams.
 **Output:**
 
-- **@adaptive/vue** (6 src files, 4 test files):
+- **@adaptive-bundle/vue** (6 src files, 4 test files):
   - `adaptive.ts` — `adaptive()` factory using `defineAsyncComponent` with tier-based import selection (172 lines)
   - `composables.ts` — `useAdaptive()`, `useTier()`, `useDeviceProfile()`, `useNetworkAware()`
   - `context.ts` — `AdaptiveProvider` using Vue provide/inject
   - `inline.ts` — `AdaptiveHigh`, `AdaptiveLow`, `AdaptiveMedium` render-function components
   - `error-recovery.ts` — retry/fallback adapted for Vue Component types
   - 20 tests passing, **1161 bytes gzipped** (under 2KB budget)
-- **@adaptive/svelte** (5 src files, 3 test files):
+- **@adaptive-bundle/svelte** (5 src files, 3 test files):
   - `adaptive.ts` — `adaptive()` returns `Readable<T | null>` store, lazily loads on first subscription
   - `stores.ts` — factory functions + singleton stores for tier, profile, network awareness
   - `context.ts` — `setAdaptiveContext()`/`getAdaptiveContext()` using Svelte context API
@@ -121,33 +121,33 @@ This document tracks all user requests and AI outputs during development, servin
 ### #012 — Phase 3 Implementation (Next.js + Nuxt Meta-Framework Integration)
 
 **Date:** 2026-03-18
-**Request:** Implement `@adaptive/next` (Next.js Webpack integration) and `@adaptive/nuxt` (Nuxt module wrapping Vite plugin + Nitro middleware).
+**Request:** Implement `@adaptive-bundle/next` (Next.js Webpack integration) and `@adaptive-bundle/nuxt` (Nuxt module wrapping Vite plugin + Nitro middleware).
 **Output:**
 
-- **@adaptive/next** (6 src files, 4 test files):
+- **@adaptive-bundle/next** (6 src files, 4 test files):
   - `with-adaptive.ts` — Config wrapper injects Webpack plugin for production client builds, chains user webpack config
   - `webpack/plugin.ts` — Webpack plugin class: hooks `thisCompilation` → `afterOptimizeModules`, runs analysis engine, applies splitChunks
   - `webpack/module-graph-adapter.ts` — Adapts `compilation.modules` to `ModuleGraph` interface (reuses vite-plugin analysis)
   - `webpack/split-chunks.ts` — Converts `BoundaryAnalysis[]` to `splitChunks.cacheGroups` config
   - `types.ts` — Webpack/Next.js type definitions
   - 25 tests passing
-- **@adaptive/nuxt** (4 src files, 2 test files):
+- **@adaptive-bundle/nuxt** (4 src files, 2 test files):
   - `module.ts` — `defineAdaptiveModule()`: injects Vite plugin via `vite:extendConfig` hook, registers Nitro middleware
   - `nitro-middleware.ts` — `createAdaptiveMiddleware()`: resolves tier from Client Hints headers, sets `adaptive_tier_hint` cookie
   - `types.ts` — Nuxt-specific config extending `AdaptivePluginConfig` with `clientHints`, `cookieName`, `cookieMaxAge`
   - 13 tests passing
-- Added `scanAllModules`, `analyzeBoundaries`, `findOpportunities`, `ModuleGraph`, `ModuleInfo` exports to `@adaptive/vite-plugin`
+- Added `scanAllModules`, `analyzeBoundaries`, `findOpportunities`, `ModuleGraph`, `ModuleInfo` exports to `@adaptive-bundle/vite-plugin`
 - Updated `CLAUDE.md` architecture reference, `README.md` with Next.js and Nuxt setup examples
 - All **209 tests** pass across 7 packages (core: 60, vite-plugin: 59, react: 19, vue: 20, svelte: 13, next: 25, nuxt: 13)
 - Key architecture: **reuse over duplication** — Next.js package imports analysis engine from vite-plugin, only chunk isolation is Webpack-specific
 
-### #013 — Phase 4 Implementation (@adaptive/devtools)
+### #013 — Phase 4 Implementation (@adaptive-bundle/devtools)
 
 **Date:** 2026-03-18
-**Request:** Implement `@adaptive/devtools` — browser overlay + Vite dev server dashboard for debugging and simulating device tiers.
+**Request:** Implement `@adaptive-bundle/devtools` — browser overlay + Vite dev server dashboard for debugging and simulating device tiers.
 **Output:**
 
-- **@adaptive/devtools** (6 src files, 3 test files):
+- **@adaptive-bundle/devtools** (6 src files, 3 test files):
   - `overlay/state.ts` — `collectState()` reads `getDeviceProfile()` from core, scans `[data-adaptive]` DOM elements for boundary decisions
   - `overlay/styles.ts` — Shadow DOM CSS: dark theme (#0f172a), glassmorphism, tier color coding (high=green, medium=amber, low=red)
   - `overlay/render.ts` — Pure HTML renderer: tier badge, probes table, reasoning chain, boundaries list, tier simulator dropdown
@@ -158,7 +158,7 @@ This document tracks all user requests and AI outputs during development, servin
 - **Vite plugin extensions** (3 new files, 3 files modified):
   - `server/middleware.ts` — Dev middleware: `/__adaptive` dashboard, `/__adaptive/api/analysis` JSON, `/__adaptive/api/simulate` HMR tier forcing
   - `server/dashboard.ts` — Standalone HTML dashboard: boundary table with sizes, collapsible dependency trees, tier simulator, HMR auto-refresh
-  - `strip-devtools.ts` — Production stripping: replaces `import('@adaptive/devtools')` with no-op Promise
+  - `strip-devtools.ts` — Production stripping: replaces `import('@adaptive-bundle/devtools')` with no-op Promise
   - Modified `index.ts`: added `configureServer` hook + `stripDevtoolsImport` in transform
   - Modified `types.ts`: added `devtools?: boolean` to config
   - Modified `config.ts`: default `devtools: true`
@@ -183,7 +183,7 @@ This document tracks all user requests and AI outputs during development, servin
   - Replaces `adaptive()` calls with **static imports** (no runtime wrapper, no dynamic import)
   - Handles two-variant pattern (`high`/`low`) and exclusion pattern (`component`) for high tier
   - Transforms `Adaptive.High`/`Adaptive.Low` JSX: unwraps matching tier children, replaces non-matching with `{null}`
-  - Cleans up unused `@adaptive/*` imports after transformation
+  - Cleans up unused `@adaptive-bundle/*` imports after transformation
   - Gracefully skips exclusion pattern for low tier (lowFallback is JSX, not extractable)
 - **Rewrote `target-tier.test.ts`** — 14 tests covering:
   - Two-variant static import replacement (high/low)

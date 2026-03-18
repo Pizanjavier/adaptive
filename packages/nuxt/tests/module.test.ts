@@ -4,7 +4,7 @@ import { defineAdaptiveModule } from '../src/module.js';
 describe('defineAdaptiveModule', () => {
   it('returns a module with correct meta', () => {
     const mod = defineAdaptiveModule();
-    expect(mod.meta.name).toBe('@adaptive/nuxt');
+    expect(mod.meta.name).toBe('@adaptive-bundle/nuxt');
     expect(mod.meta.configKey).toBe('adaptive');
   });
 

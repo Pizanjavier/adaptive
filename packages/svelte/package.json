@@ -1,5 +1,8 @@
 {
-  "name": "@adaptive/svelte",
+  "name": "@adaptive-bundle/svelte",
+  "publishConfig": {
+    "access": "public"
+  },
   "version": "0.1.0",
   "description": "Svelte adapter for Adaptive — adaptive() API and stores",
   "type": "module",
@@ -29,11 +32,11 @@
     "clean": "rm -rf dist"
   },
   "peerDependencies": {
-    "@adaptive/core": "workspace:*",
+    "@adaptive-bundle/core": "workspace:*",
     "svelte": ">=4.0.0"
   },
   "devDependencies": {
-    "@adaptive/core": "workspace:*",
+    "@adaptive-bundle/core": "workspace:*",
     "svelte": "^4.2.0"
   },
   "sideEffects": false

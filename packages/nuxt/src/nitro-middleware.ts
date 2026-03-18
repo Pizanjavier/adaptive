@@ -1,5 +1,5 @@
 import type { IncomingMessage, ServerResponse } from 'node:http';
-import { resolveTierFromHeaders } from '@adaptive/core/server';
+import { resolveTierFromHeaders } from '@adaptive-bundle/core/server';
 
 export interface NitroMiddlewareOptions {
   cookieName: string;

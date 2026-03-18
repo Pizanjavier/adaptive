@@ -2,7 +2,7 @@ import { describe, it, expect, vi, afterEach } from 'vitest';
 import { renderHook } from '@testing-library/react';
 import { useAdaptive, useTier, useNetworkAware } from '../src/hooks.js';
 
-vi.mock('@adaptive/core', () => ({
+vi.mock('@adaptive-bundle/core', () => ({
   getDeviceProfile: vi.fn(() => ({
     score: 0.7,
     confidence: 0.9,

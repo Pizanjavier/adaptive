@@ -1,5 +1,5 @@
 import { readable, type Readable } from 'svelte/store';
-import { getDeviceProfile, type Tier } from '@adaptive/core';
+import { getDeviceProfile, type Tier } from '@adaptive-bundle/core';
 import { loadWithFallback } from './error-recovery.js';
 
 type ImportFn<T> = () => Promise<{ default: T }>;

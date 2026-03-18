@@ -1,4 +1,4 @@
-import { adaptive } from '@adaptive/react';
+import { adaptive } from '@adaptive-bundle/react';
 
 const Metrics = adaptive({
   high: () => import('./AnimatedMetrics'),

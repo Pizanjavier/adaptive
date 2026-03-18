@@ -1,13 +1,13 @@
 # Configuration
 
-Adaptive has two configuration surfaces: the **Vite plugin** (build-time) and **core runtime** (client-side). Framework adapters (`@adaptive/next`, `@adaptive/nuxt`) expose subsets of these through their own config APIs.
+Adaptive has two configuration surfaces: the **Vite plugin** (build-time) and **core runtime** (client-side). Framework adapters (`@adaptive-bundle/next`, `@adaptive-bundle/nuxt`) expose subsets of these through their own config APIs.
 
 ---
 
 ## Vite Plugin Options
 
 ```ts
-import { adaptive } from '@adaptive/vite-plugin';
+import { adaptive } from '@adaptive-bundle/vite-plugin';
 
 export default defineConfig({
   plugins: [
@@ -44,7 +44,7 @@ When `targetTier` is set:
 
 1. All `adaptive()` calls become direct static imports of the targeted variant
 2. `<Adaptive.High>` / `<Adaptive.Low>` blocks are statically resolved — the non-matching block is removed as dead code
-3. `@adaptive/core` is **not included** in the output bundle
+3. `@adaptive-bundle/core` is **not included** in the output bundle
 4. Works on devices without dynamic `import()` (Chromium <63)
 
 This is the recommended approach for STB/CTV apps built per-platform:
@@ -110,7 +110,7 @@ adaptive({
 ## Core Runtime Options
 
 ```ts
-import { configure } from '@adaptive/core';
+import { configure } from '@adaptive-bundle/core';
 
 configure({
   // All options are optional — sensible defaults are applied
@@ -213,7 +213,7 @@ configure({
 
 ```ts
 // Programmatic tier forcing (for tests)
-import { setForcedTier, clearForcedTier } from '@adaptive/core/testing';
+import { setForcedTier, clearForcedTier } from '@adaptive-bundle/core/testing';
 
 beforeEach(() => setForcedTier('low'));
 afterEach(() => clearForcedTier());
@@ -351,7 +351,7 @@ const Editor = adaptive({
 
 ```ts
 // next.config.js
-const { withAdaptive } = require('@adaptive/next');
+const { withAdaptive } = require('@adaptive-bundle/next');
 
 module.exports = withAdaptive({
   adaptive: {
@@ -367,7 +367,7 @@ module.exports = withAdaptive({
 ```ts
 // nuxt.config.ts
 export default defineNuxtConfig({
-  modules: ['@adaptive/nuxt'],
+  modules: ['@adaptive-bundle/nuxt'],
   adaptive: {
     report: true,
     clientHints: true, // auto-injects Nitro middleware for Client Hints
@@ -380,7 +380,7 @@ export default defineNuxtConfig({
 ## Server-Side Detection
 
 ```ts
-import { resolveTierFromHeaders } from '@adaptive/core/server';
+import { resolveTierFromHeaders } from '@adaptive-bundle/core/server';
 
 // Express / Node.js
 app.use((req, res, next) => {
@@ -389,4 +389,4 @@ app.use((req, res, next) => {
 });
 ```
 
-The `@adaptive/core/server` module has zero DOM dependencies and runs in any JS server environment including edge runtimes.
+The `@adaptive-bundle/core/server` module has zero DOM dependencies and runs in any JS server environment including edge runtimes.

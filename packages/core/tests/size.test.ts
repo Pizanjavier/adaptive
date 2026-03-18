@@ -4,7 +4,7 @@ import { gzipSync } from 'node:zlib';
 import { resolve } from 'node:path';
 
 describe('size budget', () => {
-  it('@adaptive/core is under 3KB gzipped', () => {
+  it('@adaptive-bundle/core is under 3KB gzipped', () => {
     const distPath = resolve(__dirname, '../dist/index.js');
     const content = readFileSync(distPath);
     const gzipped = gzipSync(content);

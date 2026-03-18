@@ -1,5 +1,5 @@
 import { defineComponent } from 'vue';
-import { getDeviceProfile, type Tier } from '@adaptive/core';
+import { getDeviceProfile, type Tier } from '@adaptive-bundle/core';
 
 function createTierComponent(targetTier: Tier) {
   return defineComponent({

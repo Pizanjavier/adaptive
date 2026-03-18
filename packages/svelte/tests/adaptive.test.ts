@@ -2,11 +2,11 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { get } from 'svelte/store';
 import { adaptive } from '../src/adaptive.js';
 
-vi.mock('@adaptive/core', () => ({
+vi.mock('@adaptive-bundle/core', () => ({
   getDeviceProfile: vi.fn(),
 }));
 
-import { getDeviceProfile } from '@adaptive/core';
+import { getDeviceProfile } from '@adaptive-bundle/core';
 
 const mockGetDeviceProfile = vi.mocked(getDeviceProfile);
 

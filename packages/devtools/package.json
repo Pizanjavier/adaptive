@@ -1,5 +1,8 @@
 {
-  "name": "@adaptive/devtools",
+  "name": "@adaptive-bundle/devtools",
+  "publishConfig": {
+    "access": "public"
+  },
   "version": "0.1.0",
   "description": "Browser overlay and dev server dashboard for Adaptive — debug and simulate device tiers",
   "type": "module",
@@ -29,10 +32,10 @@
     "clean": "rm -rf dist"
   },
   "peerDependencies": {
-    "@adaptive/core": "workspace:*"
+    "@adaptive-bundle/core": "workspace:*"
   },
   "devDependencies": {
-    "@adaptive/core": "workspace:*"
+    "@adaptive-bundle/core": "workspace:*"
   },
   "sideEffects": false
 }

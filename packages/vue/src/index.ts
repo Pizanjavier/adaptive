@@ -4,4 +4,4 @@ export { useAdaptive, useDeviceProfile, useTier, useNetworkAware } from './compo
 export { AdaptiveProvider } from './context.js';
 
 export type { UseAdaptiveResult, UseNetworkAwareResult } from './composables.js';
-export type { DeviceProfile, Tier, EffectiveType } from '@adaptive/core';
+export type { DeviceProfile, Tier, EffectiveType } from '@adaptive-bundle/core';

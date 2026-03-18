@@ -1,5 +1,8 @@
 {
-  "name": "@adaptive/vite-plugin",
+  "name": "@adaptive-bundle/vite-plugin",
+  "publishConfig": {
+    "access": "public"
+  },
   "version": "0.1.0",
   "description": "Vite plugin for device-aware bundle optimization",
   "type": "module",

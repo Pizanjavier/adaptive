@@ -1,4 +1,4 @@
-import type { BoundaryAnalysis } from '@adaptive/vite-plugin';
+import type { BoundaryAnalysis } from '@adaptive-bundle/vite-plugin';
 import type { CacheGroupConfig } from '../types.js';
 
 export function buildCacheGroups(analyses: BoundaryAnalysis[]): Record<string, CacheGroupConfig> {

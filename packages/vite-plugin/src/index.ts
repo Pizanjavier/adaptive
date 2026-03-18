@@ -16,7 +16,7 @@ import { createDevMiddleware } from './server/middleware.js';
  * @example
  * ```ts
  * // vite.config.ts
- * import { adaptive } from '@adaptive/vite-plugin';
+ * import { adaptive } from '@adaptive-bundle/vite-plugin';
  *
  * export default defineConfig({
  *   plugins: [adaptive({ report: true })],

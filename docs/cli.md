@@ -1,6 +1,6 @@
 # CLI Reference
 
-The `@adaptive/vite-plugin` ships a CLI for standalone analysis, scaffolding, and validation.
+The `@adaptive-bundle/vite-plugin` ships a CLI for standalone analysis, scaffolding, and validation.
 
 ```bash
 npx adaptive <command> [options]
@@ -46,7 +46,7 @@ Next: implement the lite variant in MapViewLite.tsx
 The generated `.adaptive.tsx` file uses the two-variant pattern:
 
 ```tsx
-import { adaptive } from '@adaptive/react';
+import { adaptive } from '@adaptive-bundle/react';
 
 const MapView = adaptive({
   high: () => import('./MapView'),

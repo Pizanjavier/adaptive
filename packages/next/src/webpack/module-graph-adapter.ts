@@ -1,4 +1,4 @@
-import type { ModuleGraph, ModuleInfo } from '@adaptive/vite-plugin';
+import type { ModuleGraph, ModuleInfo } from '@adaptive-bundle/vite-plugin';
 import type { WebpackCompilation, WebpackModule } from '../types.js';
 
 export function createModuleGraphAdapter(compilation: WebpackCompilation): ModuleGraph {

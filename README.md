@@ -4,7 +4,7 @@
 
 <img src="adaptive.png" alt="Adaptive" width="140" />
 
-# Adaptive
+# Adaptive Bundle
 
 **Ship 60-90% less JavaScript to devices that can't handle it.**
 
@@ -41,22 +41,22 @@ No production-grade tooling exists for adaptive loading. Google Chrome Labs vali
 ## Install
 
 ```bash
-pnpm add -D @adaptive/vite-plugin
-pnpm add @adaptive/core
+pnpm add -D @adaptive-bundle/vite-plugin
+pnpm add @adaptive-bundle/core
 
 # Pick your framework adapter:
-pnpm add @adaptive/react    # React 18+
-pnpm add @adaptive/vue      # Vue 3.3+
-pnpm add @adaptive/svelte   # Svelte 4+
-pnpm add @adaptive/next     # Next.js 13+
-pnpm add @adaptive/nuxt     # Nuxt 3+
+pnpm add @adaptive-bundle/react    # React 18+
+pnpm add @adaptive-bundle/vue      # Vue 3.3+
+pnpm add @adaptive-bundle/svelte   # Svelte 4+
+pnpm add @adaptive-bundle/next     # Next.js 13+
+pnpm add @adaptive-bundle/nuxt     # Nuxt 3+
 ```
 
 ## Level 0: Plugin Setup (zero code changes)
 
 ```ts
 // vite.config.ts
-import { adaptive } from '@adaptive/vite-plugin';
+import { adaptive } from '@adaptive-bundle/vite-plugin';
 import { defineConfig } from 'vite';
 
 export default defineConfig({
@@ -84,7 +84,7 @@ See the **[Demo App README](fixtures/demo-app/README.md)** for architecture deta
 Exclude a heavy component on low-tier devices entirely:
 
 ```tsx
-import { adaptive } from '@adaptive/react';
+import { adaptive } from '@adaptive-bundle/react';
 
 const MapView = adaptive({
   component: () => import('./MapboxMap'),
@@ -127,7 +127,7 @@ Score >= 0.65 loads high, < 0.35 loads low, between loads medium.
 Conditional rendering within JSX:
 
 ```tsx
-import { Adaptive } from '@adaptive/react';
+import { Adaptive } from '@adaptive-bundle/react';
 
 function Dashboard() {
   return (
@@ -147,7 +147,7 @@ function Dashboard() {
 
 ```vue
 <script setup>
-import { adaptive } from '@adaptive/vue';
+import { adaptive } from '@adaptive-bundle/vue';
 
 const MapView = adaptive({
   high: () => import('./MapboxMap.vue'),
@@ -164,7 +164,7 @@ const MapView = adaptive({
 
 ```svelte
 <script>
-import { adaptive } from '@adaptive/svelte';
+import { adaptive } from '@adaptive-bundle/svelte';
 
 const MapView = adaptive({
   high: () => import('./MapboxMap.svelte'),
@@ -180,7 +180,7 @@ const MapView = adaptive({
 ### React
 
 ```tsx
-import { useAdaptive, useTier, useDeviceProfile, useNetworkAware } from '@adaptive/react';
+import { useAdaptive, useTier, useDeviceProfile, useNetworkAware } from '@adaptive-bundle/react';
 
 function MyComponent() {
   const { tier, shouldDefer, profile } = useAdaptive();
@@ -193,7 +193,7 @@ function MyComponent() {
 Wrap your app in `AdaptiveProvider` to cache the profile across hooks and prevent re-detection on every hook call:
 
 ```tsx
-import { AdaptiveProvider } from '@adaptive/react';
+import { AdaptiveProvider } from '@adaptive-bundle/react';
 
 <AdaptiveProvider>
   <App />
@@ -203,7 +203,7 @@ import { AdaptiveProvider } from '@adaptive/react';
 ### Vue
 
 ```ts
-import { useAdaptive, useTier, useDeviceProfile, useNetworkAware } from '@adaptive/vue';
+import { useAdaptive, useTier, useDeviceProfile, useNetworkAware } from '@adaptive-bundle/vue';
 
 const { tier, shouldDefer, profile } = useAdaptive();
 const tier = useTier();
@@ -214,7 +214,7 @@ const { shouldDefer, effectiveType } = useNetworkAware();
 ### Svelte
 
 ```ts
-import { tierStore, deviceProfileStore, networkAwareStore } from '@adaptive/svelte';
+import { tierStore, deviceProfileStore, networkAwareStore } from '@adaptive-bundle/svelte';
 
 $tierStore; // 'high' | 'low' | 'medium'
 $deviceProfileStore; // full DeviceProfile
@@ -272,7 +272,7 @@ adaptive({
 ```
 
 ```bash
-PLATFORM=foxtel pnpm build   # low-tier-only bundle, no @adaptive/core
+PLATFORM=foxtel pnpm build   # low-tier-only bundle, no @adaptive-bundle/core
 ```
 
 ## CLI
@@ -294,7 +294,7 @@ See the full **[CLI Reference](docs/cli.md)**.
 ### Browser Overlay
 
 ```ts
-import('@adaptive/devtools').then((d) => d.init());
+import('@adaptive-bundle/devtools').then((d) => d.init());
 ```
 
 Shows current tier, score, confidence, all probe values, reasoning chain, per-boundary decisions, and a tier simulator dropdown. Automatically stripped from production builds.
@@ -355,7 +355,7 @@ Basic setup works out of the box. For full options — scoring weights, threshol
 Resolve tier from Client Hints headers to avoid the 50ms client-side detection cost entirely:
 
 ```ts
-import { resolveTierFromHeaders } from '@adaptive/core/server';
+import { resolveTierFromHeaders } from '@adaptive-bundle/core/server';
 
 // Express / any Node.js server
 app.use((req, res, next) => {
@@ -369,7 +369,7 @@ Works in any JS server environment including edge runtimes (Cloudflare Workers, 
 ## Testing
 
 ```ts
-import { setForcedTier, clearForcedTier } from '@adaptive/core/testing';
+import { setForcedTier, clearForcedTier } from '@adaptive-bundle/core/testing';
 
 beforeEach(() => setForcedTier('low'));
 afterEach(() => clearForcedTier());
@@ -383,7 +383,7 @@ Use `npx adaptive validate` in CI to check boundary correctness.
 
 ```ts
 // next.config.js
-const { withAdaptive } = require('@adaptive/next');
+const { withAdaptive } = require('@adaptive-bundle/next');
 
 module.exports = withAdaptive({
   adaptive: {
@@ -400,7 +400,7 @@ The Webpack plugin runs analysis at build time (production only, client-side) us
 ```ts
 // nuxt.config.ts
 export default defineNuxtConfig({
-  modules: ['@adaptive/nuxt'],
+  modules: ['@adaptive-bundle/nuxt'],
   adaptive: {
     report: true,
     clientHints: true, // auto-injects Nitro middleware for Client Hints
@@ -418,14 +418,14 @@ Adaptive is **100% local, zero-telemetry, zero-network**. No data ever leaves th
 
 ```
 packages/
-  core/          @adaptive/core           Detection + scoring (~3KB gzipped, zero deps)
-  vite-plugin/   @adaptive/vite-plugin    Build analysis, chunk splitting, CLI, reports
-  react/         @adaptive/react          adaptive() + hooks + Adaptive.High/Low
-  vue/           @adaptive/vue            adaptive() + composables + AdaptiveHigh/Low
-  svelte/        @adaptive/svelte         adaptive() + stores + context
-  next/          @adaptive/next           Next.js Webpack plugin (reuses vite-plugin analysis)
-  nuxt/          @adaptive/nuxt           Nuxt module + Nitro middleware
-  devtools/      @adaptive/devtools       Browser overlay + dev dashboard
+  core/          @adaptive-bundle/core           Detection + scoring (~3KB gzipped, zero deps)
+  vite-plugin/   @adaptive-bundle/vite-plugin    Build analysis, chunk splitting, CLI, reports
+  react/         @adaptive-bundle/react          adaptive() + hooks + Adaptive.High/Low
+  vue/           @adaptive-bundle/vue            adaptive() + composables + AdaptiveHigh/Low
+  svelte/        @adaptive-bundle/svelte         adaptive() + stores + context
+  next/          @adaptive-bundle/next           Next.js Webpack plugin (reuses vite-plugin analysis)
+  nuxt/          @adaptive-bundle/nuxt           Nuxt module + Nitro middleware
+  devtools/      @adaptive-bundle/devtools       Browser overlay + dev dashboard
 ```
 
 Chunk isolation guarantee: **no code from the high variant leaks into the low-tier bundle**. Exclusive dependencies are isolated into separate chunks. Shared dependencies stay in common chunks without duplication.
@@ -442,12 +442,12 @@ pnpm lint
 
 ## Size Budgets
 
-| Package            | Budget        | Enforced     |
-| ------------------ | ------------- | ------------ |
-| `@adaptive/core`   | 3KB gzipped   | CI blocks PR |
-| `@adaptive/react`  | 2KB gzipped   | CI blocks PR |
-| `@adaptive/vue`    | 2KB gzipped   | CI blocks PR |
-| `@adaptive/svelte` | 1.5KB gzipped | CI blocks PR |
+| Package                   | Budget        | Enforced     |
+| ------------------------- | ------------- | ------------ |
+| `@adaptive-bundle/core`   | 3KB gzipped   | CI blocks PR |
+| `@adaptive-bundle/react`  | 2KB gzipped   | CI blocks PR |
+| `@adaptive-bundle/vue`    | 2KB gzipped   | CI blocks PR |
+| `@adaptive-bundle/svelte` | 1.5KB gzipped | CI blocks PR |
 
 ---
 

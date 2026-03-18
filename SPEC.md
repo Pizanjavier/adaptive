@@ -34,20 +34,20 @@ Adaptive is NOT just a lazy-loading wrapper. It is a build analysis and optimiza
 
 ```
 packages/
-  vite-plugin/     @adaptive/vite-plugin     Build-time analysis, chunk splitting, CLI, reports
-  core/            @adaptive/core            Detection engine, scoring, tier resolution
-  react/           @adaptive/react           adaptive() + Adaptive.High/Low React wrappers + hooks
-  vue/             @adaptive/vue             adaptive() Vue wrapper
-  svelte/          @adaptive/svelte          adaptive() Svelte wrapper
-  next/            @adaptive/next            Next.js plugin (Webpack integration + middleware)
-  nuxt/            @adaptive/nuxt            Nuxt module (auto-configures Vite plugin + Nitro middleware)
-  devtools/        @adaptive/devtools        Browser overlay + Vite plugin UI panel
+  vite-plugin/     @adaptive-bundle/vite-plugin     Build-time analysis, chunk splitting, CLI, reports
+  core/            @adaptive-bundle/core            Detection engine, scoring, tier resolution
+  react/           @adaptive-bundle/react           adaptive() + Adaptive.High/Low React wrappers + hooks
+  vue/             @adaptive-bundle/vue             adaptive() Vue wrapper
+  svelte/          @adaptive-bundle/svelte          adaptive() Svelte wrapper
+  next/            @adaptive-bundle/next            Next.js plugin (Webpack integration + middleware)
+  nuxt/            @adaptive-bundle/nuxt            Nuxt module (auto-configures Vite plugin + Nitro middleware)
+  devtools/        @adaptive-bundle/devtools        Browser overlay + Vite plugin UI panel
 ```
 
 ### Dependency graph
 
 ```
-@adaptive/vite-plugin  (dev dependency — build time only)
+@adaptive-bundle/vite-plugin  (dev dependency — build time only)
        │
        ├── analyzes source code for adaptive() and Adaptive.High/Low calls
        ├── configures chunk splitting in Rollup
@@ -55,17 +55,17 @@ packages/
        ├── generates build reports
        └── enforces CI performance budgets
 
-@adaptive/next  (dev dependency — wraps Webpack for Next.js)
+@adaptive-bundle/next  (dev dependency — wraps Webpack for Next.js)
        └── provides equivalent chunk isolation + analysis for Webpack
 
-@adaptive/nuxt  (dev dependency — Nuxt module)
-       └── auto-configures @adaptive/vite-plugin + Nitro middleware
+@adaptive-bundle/nuxt  (dev dependency — Nuxt module)
+       └── auto-configures @adaptive-bundle/vite-plugin + Nitro middleware
 
-@adaptive/react ─── depends on ──→ @adaptive/core
-@adaptive/vue   ─── depends on ──→ @adaptive/core
-@adaptive/svelte ── depends on ──→ @adaptive/core
+@adaptive-bundle/react ─── depends on ──→ @adaptive-bundle/core
+@adaptive-bundle/vue   ─── depends on ──→ @adaptive-bundle/core
+@adaptive-bundle/svelte ── depends on ──→ @adaptive-bundle/core
 
-@adaptive/core  (zero dependencies, ~3KB gzipped)
+@adaptive-bundle/core  (zero dependencies, ~3KB gzipped)
        │
        ├── device hardware detection
        ├── composite scoring engine (hardware only)
@@ -73,7 +73,7 @@ packages/
        ├── network awareness layer (separate from tier)
        └── probe normalization + caching
 
-@adaptive/devtools  (optional, dev only)
+@adaptive-bundle/devtools  (optional, dev only)
        │
        ├── browser overlay showing current tier + probes
        └── Vite dev server panel with analysis UI
@@ -87,7 +87,7 @@ Adaptive is designed for progressive adoption. Each level adds value without req
 
 ```ts
 // vite.config.ts
-import { adaptive } from '@adaptive/vite-plugin';
+import { adaptive } from '@adaptive-bundle/vite-plugin';
 
 export default defineConfig({
   plugins: [adaptive()],
@@ -153,7 +153,7 @@ Developers choose between three API styles depending on the scope of the boundar
 Best for when the goal is simply to **skip a heavy component on low-tier devices** without writing a full alternative implementation. This is the lowest-friction entry point — no parallel files to maintain, no drift risk:
 
 ```tsx
-import { adaptive } from '@adaptive/react';
+import { adaptive } from '@adaptive-bundle/react';
 
 const MapView = adaptive({
   component: () => import('./MapboxMap'),
@@ -176,7 +176,7 @@ This covers the majority of real-world use cases: "show the fancy thing on capab
 Best for when the high and low variants are fundamentally different components that both need significant logic (e.g., interactive map vs. Leaflet map):
 
 ```tsx
-import { adaptive } from '@adaptive/react';
+import { adaptive } from '@adaptive-bundle/react';
 
 const DashboardExperience = adaptive({
   high: () => import('./features/DashboardFull'),
@@ -190,7 +190,7 @@ const DashboardExperience = adaptive({
 Best for when specific sections within a component differ by tier, without needing entirely separate component files. This dramatically lowers the maintenance burden — no parallel files to keep in sync:
 
 ```tsx
-import { Adaptive } from '@adaptive/react';
+import { Adaptive } from '@adaptive-bundle/react';
 
 function Dashboard({ data }) {
   return (
@@ -251,7 +251,7 @@ The CLI:
 
 ## 6. Runtime API
 
-### 6.1 Core Detection Engine (`@adaptive/core`)
+### 6.1 Core Detection Engine (`@adaptive-bundle/core`)
 
 The detection engine reads all available hardware probes, normalizes them, and computes a composite score.
 
@@ -285,7 +285,7 @@ Data saver is the exception: it represents an explicit user choice, not a transi
 The network layer provides a separate API for developers who want network-aware behavior:
 
 ```ts
-import { useNetworkAware } from '@adaptive/react';
+import { useNetworkAware } from '@adaptive-bundle/react';
 
 function VideoPlayer({ src }) {
   const { shouldDefer, effectiveType } = useNetworkAware();
@@ -325,7 +325,7 @@ Each hardware probe is normalized to a 0-1 range using the following calibration
 | Screen resolution | `width × height × DPR`          | ≤480px effective width       | ≥1920px effective width    | Linear clamp on effective pixels              |
 | Max touch points  | `navigator.maxTouchPoints`      | 0 (desktop/STB — no signal)  | ≥5 (modern touch device)   | Heuristic: 0→0.5 (neutral), 1→0.4, ≥5→0.6     |
 
-**Calibration methodology:** These ranges are derived from public device distribution data (HTTP Archive, StatCounter, Google Chrome UX Report). The ranges are intentionally wide — a device at the 10th percentile of web traffic should score ~0.1, and a device at the 90th should score ~0.9. The 0.5 tier threshold should sit in the natural valley of the bimodal device capability distribution (cheap phones vs. flagships). These constants are baked into `@adaptive/core` and require no external data.
+**Calibration methodology:** These ranges are derived from public device distribution data (HTTP Archive, StatCounter, Google Chrome UX Report). The ranges are intentionally wide — a device at the 10th percentile of web traffic should score ~0.1, and a device at the 90th should score ~0.9. The 0.5 tier threshold should sit in the natural valley of the bimodal device capability distribution (cheap phones vs. flagships). These constants are baked into `@adaptive-bundle/core` and require no external data.
 
 **Touch points nuance:** Touch points is a weak signal — desktops report 0, modern phones report 5-10, but some 2-in-1 laptops report 10+. The normalization maps 0 to 0.5 (neutral, not penalized) rather than 0.0, since desktop devices are high-capability. This probe's low weight (0.05) means it only breaks ties.
 
@@ -398,7 +398,7 @@ The `reasoning` array explicitly notes which probes were unavailable and how wei
 
 The engine must still produce a usable tier — it never returns "unknown" or forces a fallback tier without a score.
 
-### 6.2 React Adapter (`@adaptive/react`)
+### 6.2 React Adapter (`@adaptive-bundle/react`)
 
 The React adapter provides three APIs: single-component exclusion, two-variant boundaries, and inline boundaries.
 
@@ -407,7 +407,7 @@ The React adapter provides three APIs: single-component exclusion, two-variant b
 The simplest API — skip a heavy component on low-tier devices without writing a second file:
 
 ```tsx
-import { adaptive } from '@adaptive/react';
+import { adaptive } from '@adaptive-bundle/react';
 
 const MapView = adaptive({
   component: () => import('./MapboxMap'),
@@ -458,7 +458,7 @@ This API covers the majority of real-world use cases. Props are forwarded to the
 For cases where both tiers need substantial, different implementations:
 
 ```tsx
-import { adaptive } from '@adaptive/react';
+import { adaptive } from '@adaptive-bundle/react';
 
 const MapView = adaptive({
   high: () => import('./MapboxMap'),
@@ -513,7 +513,7 @@ interface AdaptiveVariantConfig<HighProps, LowProps = HighProps, MedProps = High
 
 `adaptive()` returns a React component that:
 
-1. On mount, reads the cached device tier from `@adaptive/core`.
+1. On mount, reads the cached device tier from `@adaptive-bundle/core`.
 2. Loads the corresponding dynamic import.
 3. Renders the fallback (wrapped in a container with `layout` dimensions) while loading.
 4. Renders the resolved component, forwarding all props.
@@ -556,7 +556,7 @@ For the single-component exclusion API, cross-tier fallback means rendering the 
 Best for tier-specific sections within a single component. Lower maintenance cost — everything stays in one file:
 
 ```tsx
-import { Adaptive } from '@adaptive/react';
+import { Adaptive } from '@adaptive-bundle/react';
 
 function Dashboard({ data }) {
   return (
@@ -591,7 +591,7 @@ For cases where `<Adaptive.Low>` also needs a dynamic import:
 The primary hook is `useAdaptive()` — a single entry point that combines tier and network awareness. Internally, tier comes from hardware scoring (stable, cached) and `shouldDefer` comes from network conditions (transient). The architectural separation is an implementation detail, not an API burden:
 
 ```tsx
-import { useAdaptive } from '@adaptive/react';
+import { useAdaptive } from '@adaptive-bundle/react';
 
 function VideoPlayer({ src }) {
   const { tier, shouldDefer, profile } = useAdaptive();
@@ -617,7 +617,7 @@ interface UseAdaptiveResult {
 Individual hooks are also available for focused use cases:
 
 ```tsx
-import { useDeviceProfile, useTier, useNetworkAware } from '@adaptive/react';
+import { useDeviceProfile, useTier, useNetworkAware } from '@adaptive-bundle/react';
 
 function DebugPanel() {
   const profile = useDeviceProfile(); // Full DeviceProfile object
@@ -635,11 +635,11 @@ When they have different props, TypeScript should error at the `adaptive()` call
 
 For inline boundaries, the render function in the `children` prop receives the imported component with full type inference.
 
-### 6.3 Vue Adapter (`@adaptive/vue`)
+### 6.3 Vue Adapter (`@adaptive-bundle/vue`)
 
 ```vue
 <script setup>
-import { adaptive } from '@adaptive/vue';
+import { adaptive } from '@adaptive-bundle/vue';
 
 const MapView = adaptive({
   high: () => import('./MapboxMap.vue'),
@@ -652,13 +652,13 @@ const MapView = adaptive({
 </template>
 ```
 
-Internally uses Vue's `defineAsyncComponent` with the tier resolution from `@adaptive/core`.
+Internally uses Vue's `defineAsyncComponent` with the tier resolution from `@adaptive-bundle/core`.
 
-### 6.4 Svelte Adapter (`@adaptive/svelte`)
+### 6.4 Svelte Adapter (`@adaptive-bundle/svelte`)
 
 ```svelte
 <script>
-import { adaptive } from '@adaptive/svelte';
+import { adaptive } from '@adaptive-bundle/svelte';
 
 const MapView = adaptive({
   high: () => import('./MapboxMap.svelte'),
@@ -682,7 +682,7 @@ Adaptive treats STB/CTV as a **first-class target** through three mechanisms: cu
 The detection engine accepts user-supplied probe providers that return platform-specific capability data. This is essential for STB/CTV devices where native JS bridges expose hardware info that browser standard APIs don't cover:
 
 ```ts
-import { configure } from '@adaptive/core';
+import { configure } from '@adaptive-bundle/core';
 
 configure({
   probeProviders: {
@@ -729,7 +729,7 @@ Custom probe providers are registered once at app startup and cached like any ot
 For operator-distributed CTV apps, the target device is known at development time. A static device map bypasses the scoring engine entirely — it's a lookup table from platform identifier to tier:
 
 ```ts
-import { configure } from '@adaptive/core';
+import { configure } from '@adaptive-bundle/core';
 
 configure({
   deviceMap: {
@@ -783,7 +783,7 @@ For CTV apps built per-platform (one build for Tizen, one for webOS, one for Sky
 
 ```ts
 // vite.config.sky-q.ts — build specifically for Sky Q
-import { adaptive } from '@adaptive/vite-plugin';
+import { adaptive } from '@adaptive-bundle/vite-plugin';
 
 export default defineConfig({
   plugins: [
@@ -796,7 +796,7 @@ export default defineConfig({
 
 ```ts
 // vite.config.sky-soip.ts — build specifically for Sky SoIP
-import { adaptive } from '@adaptive/vite-plugin';
+import { adaptive } from '@adaptive-bundle/vite-plugin';
 
 export default defineConfig({
   plugins: [
@@ -809,7 +809,7 @@ export default defineConfig({
 
 When `targetTier` is set:
 
-1. The plugin transforms all `adaptive()` calls into direct imports of the targeted variant — no runtime wrapper, no dynamic `import()`, no `@adaptive/core` included in the bundle at all.
+1. The plugin transforms all `adaptive()` calls into direct imports of the targeted variant — no runtime wrapper, no dynamic `import()`, no `@adaptive-bundle/core` included in the bundle at all.
 2. `<Adaptive.High>` / `<Adaptive.Low>` blocks are statically resolved — the non-matching block is removed as dead code by Rollup's tree-shaking.
 3. The build report shows the final per-platform bundle sizes with no adaptive runtime overhead.
 4. This works even on devices where dynamic `import()` is unavailable (Chromium <63), since all imports become static.
@@ -876,7 +876,7 @@ The Vite plugin reports the total number of adaptive boundaries per route and wa
 
 ```ts
 // vite.config.ts
-import { adaptive } from '@adaptive/vite-plugin';
+import { adaptive } from '@adaptive-bundle/vite-plugin';
 
 export default defineConfig({
   plugins: [
@@ -1221,7 +1221,7 @@ For applications using SSR with Client Hints:
 
 ```ts
 // Server-side (e.g., Express/Fastify handler)
-import { resolveTierFromHeaders } from '@adaptive/core/server';
+import { resolveTierFromHeaders } from '@adaptive-bundle/core/server';
 
 app.get('*', (req, res) => {
   const tierHint = resolveTierFromHeaders(req.headers);
@@ -1243,7 +1243,7 @@ For applications deployed behind edge platforms, tier resolution can happen at t
 
 ```ts
 // Cloudflare Worker / Vercel Edge Function
-import { resolveTierFromHeaders } from '@adaptive/core/server';
+import { resolveTierFromHeaders } from '@adaptive-bundle/core/server';
 
 export default {
   async fetch(request: Request) {
@@ -1257,7 +1257,7 @@ export default {
 
 Edge detection eliminates both the client-side detection cost AND the skeleton flash. The client receives HTML that already contains the correct variant. This is the highest-performance path and the plugin should make it trivially easy to set up.
 
-The `@adaptive/core/server` module is intentionally lightweight (no DOM dependencies, no WebGL) so it runs in any JavaScript server environment including edge runtimes.
+The `@adaptive-bundle/core/server` module is intentionally lightweight (no DOM dependencies, no WebGL) so it runs in any JavaScript server environment including edge runtimes.
 
 ## 9. Meta-Framework Integration
 
@@ -1269,7 +1269,7 @@ Next.js uses Webpack by default, not Vite. Adaptive provides a separate Next.js 
 
 ```ts
 // next.config.js
-const { withAdaptive } = require('@adaptive/next');
+const { withAdaptive } = require('@adaptive-bundle/next');
 
 module.exports = withAdaptive({
   adaptive: {
@@ -1285,7 +1285,7 @@ Adaptive boundaries are inherently client components — they depend on device d
 
 ```tsx
 'use client';
-import { adaptive } from '@adaptive/react';
+import { adaptive } from '@adaptive-bundle/react';
 
 const MapView = adaptive({
   high: () => import('./MapboxMap'),
@@ -1293,11 +1293,11 @@ const MapView = adaptive({
 });
 ```
 
-Server Components can import and render adaptive boundaries without themselves becoming client components — React's module boundary handles this automatically. The key architectural constraint: `@adaptive/core` detection logic never runs in the RSC server environment. On the server, adaptive components render their `fallback` (or the hinted variant if a tier hint cookie/header is available from middleware).
+Server Components can import and render adaptive boundaries without themselves becoming client components — React's module boundary handles this automatically. The key architectural constraint: `@adaptive-bundle/core` detection logic never runs in the RSC server environment. On the server, adaptive components render their `fallback` (or the hinted variant if a tier hint cookie/header is available from middleware).
 
-`@adaptive/core/server` (the Client Hints resolver) is designed separately — it has zero DOM/browser dependencies and runs in any server environment including RSC, edge runtimes, and Nitro.
+`@adaptive-bundle/core/server` (the Client Hints resolver) is designed separately — it has zero DOM/browser dependencies and runs in any server environment including RSC, edge runtimes, and Nitro.
 
-The `@adaptive/next` Webpack plugin analyzes the RSC module graph, which differs from standard Vite's module graph. The analysis engine's bundler-agnostic core (AST scanning, dependency resolution) handles both — the Webpack adapter hooks into Next.js's `splitChunks` configuration for chunk isolation.
+The `@adaptive-bundle/next` Webpack plugin analyzes the RSC module graph, which differs from standard Vite's module graph. The analysis engine's bundler-agnostic core (AST scanning, dependency resolution) handles both — the Webpack adapter hooks into Next.js's `splitChunks` configuration for chunk isolation.
 
 #### Middleware Integration
 
@@ -1305,7 +1305,7 @@ Next.js middleware can read Client Hints and pass tier hints via cookies/headers
 
 ```ts
 // middleware.ts
-import { resolveTierFromHeaders } from '@adaptive/core/server';
+import { resolveTierFromHeaders } from '@adaptive-bundle/core/server';
 
 export function middleware(request: NextRequest) {
   const tier = resolveTierFromHeaders(request.headers);
@@ -1317,11 +1317,11 @@ export function middleware(request: NextRequest) {
 
 ### 9.2 Remix / React Router v7
 
-Remix uses Vite natively, so the standard `@adaptive/vite-plugin` works directly. Loader functions can pass tier hints:
+Remix uses Vite natively, so the standard `@adaptive-bundle/vite-plugin` works directly. Loader functions can pass tier hints:
 
 ```ts
 // app/routes/dashboard.tsx
-import { resolveTierFromHeaders } from '@adaptive/core/server';
+import { resolveTierFromHeaders } from '@adaptive-bundle/core/server';
 
 export async function loader({ request }: LoaderFunctionArgs) {
   const tierHint = resolveTierFromHeaders(request.headers);
@@ -1336,14 +1336,14 @@ Nuxt uses Vite natively. The plugin integrates via Nuxt modules:
 ```ts
 // nuxt.config.ts
 export default defineNuxtConfig({
-  modules: ['@adaptive/nuxt'],
+  modules: ['@adaptive-bundle/nuxt'],
   adaptive: {
     report: true,
   },
 });
 ```
 
-The `@adaptive/nuxt` module auto-configures the Vite plugin and provides Nitro server middleware for Client Hints.
+The `@adaptive-bundle/nuxt` module auto-configures the Vite plugin and provides Nitro server middleware for Client Hints.
 
 ### 9.4 SvelteKit
 
@@ -1351,7 +1351,7 @@ SvelteKit uses Vite natively. Standard plugin works. Server hooks provide tier h
 
 ```ts
 // src/hooks.server.ts
-import { resolveTierFromHeaders } from '@adaptive/core/server';
+import { resolveTierFromHeaders } from '@adaptive-bundle/core/server';
 
 export async function handle({ event, resolve }) {
   event.locals.tierHint = resolveTierFromHeaders(event.request.headers);
@@ -1361,7 +1361,7 @@ export async function handle({ event, resolve }) {
 
 ## 10. DevTools
 
-### 10.1 Browser Overlay (`@adaptive/devtools`)
+### 10.1 Browser Overlay (`@adaptive-bundle/devtools`)
 
 An optional package that, when imported in development, renders a floating overlay showing:
 
@@ -1377,7 +1377,7 @@ The overlay is stripped from production builds by the Vite plugin.
 ```tsx
 // main.tsx (dev only)
 if (import.meta.env.DEV) {
-  import('@adaptive/devtools').then((d) => d.init());
+  import('@adaptive-bundle/devtools').then((d) => d.init());
 }
 ```
 
@@ -1393,7 +1393,7 @@ The Vite plugin adds a panel to Vite's built-in dev server UI showing:
 ### 10.3 Testing Utilities
 
 ```ts
-import { setForcedTier, clearForcedTier } from '@adaptive/core/testing';
+import { setForcedTier, clearForcedTier } from '@adaptive-bundle/core/testing';
 
 // In tests
 beforeEach(() => setForcedTier('low'));
@@ -1413,7 +1413,7 @@ Each variant should be unit-tested independently as a normal component. The `ada
 
 ```tsx
 import { render, screen } from '@testing-library/react';
-import { setForcedTier, clearForcedTier } from '@adaptive/core/testing';
+import { setForcedTier, clearForcedTier } from '@adaptive-bundle/core/testing';
 import MapView from './MapView.adaptive';
 
 afterEach(() => clearForcedTier());
@@ -1436,7 +1436,7 @@ test('renders static image on low-tier devices', async () => {
 The Vite plugin exports analysis functions that can be used to verify chunk isolation in CI:
 
 ```ts
-import { scanAllModules, analyzeBoundaries } from '@adaptive/vite-plugin';
+import { scanAllModules, analyzeBoundaries } from '@adaptive-bundle/vite-plugin';
 
 test('high variant dependencies do not leak into low variant chunks', () => {
   // Use the analysis functions with your build's module graph
@@ -1476,17 +1476,17 @@ test('dashboard renders full version on high-tier', async ({ page }) => {
 
 The runtime must not become the bottleneck:
 
-| Package              | Max gzipped size | Rationale                                                 |
-| -------------------- | ---------------- | --------------------------------------------------------- |
-| `@adaptive/core`     | 3KB              | Detection + scoring must be tiny. It loads on every page. |
-| `@adaptive/react`    | 2KB              | Thin wrapper over React.lazy + Suspense.                  |
-| `@adaptive/vue`      | 2KB              | Thin wrapper over defineAsyncComponent.                   |
-| `@adaptive/svelte`   | 1.5KB            | Thin wrapper over Svelte async.                           |
-| `@adaptive/devtools` | 15KB             | Dev only — never shipped to production.                   |
+| Package                     | Max gzipped size | Rationale                                                 |
+| --------------------------- | ---------------- | --------------------------------------------------------- |
+| `@adaptive-bundle/core`     | 3KB              | Detection + scoring must be tiny. It loads on every page. |
+| `@adaptive-bundle/react`    | 2KB              | Thin wrapper over React.lazy + Suspense.                  |
+| `@adaptive-bundle/vue`      | 2KB              | Thin wrapper over defineAsyncComponent.                   |
+| `@adaptive-bundle/svelte`   | 1.5KB            | Thin wrapper over Svelte async.                           |
+| `@adaptive-bundle/devtools` | 15KB             | Dev only — never shipped to production.                   |
 
 Detection must complete in **under 50ms** on any device. GPU tier lookup (the heaviest operation — requires WebGL context) must be lazy and cached.
 
-**Hard constraints for `@adaptive/core`:**
+**Hard constraints for `@adaptive-bundle/core`:**
 
 - Zero runtime dependencies. No exceptions.
 - No string tables, lookup maps, or GPU model databases.
@@ -1516,7 +1516,7 @@ If the total runtime cost exceeds 5KB gzipped, the minimum useful savings thresh
 | SSR with no Client Hints                      | Render fallback skeleton. Client resolves on hydration.                                                                    |
 | STB/CTV with device map configured            | Tier resolved instantly via `detectPlatform()` → `deviceMap` lookup. Confidence 1.0. No scoring.                           |
 | STB/CTV with custom probe provider            | Native API result takes priority over browser probes. Falls through to browser detection if provider returns null.         |
-| STB/CTV with `targetTier` build               | No runtime detection at all. Variant resolved at compile time. `@adaptive/core` not included in bundle.                    |
+| STB/CTV with `targetTier` build               | No runtime detection at all. Variant resolved at compile time. `@adaptive-bundle/core` not included in bundle.             |
 | Old Chromium without dynamic `import()` (<63) | Use `targetTier` build-time resolution — all imports become static. Runtime-only mode is unsupported below Chrome 63.      |
 | STB with software-rendered WebGL              | GPU probe returns misleading results. Reduce GPU weight or use device map instead.                                         |
 
@@ -1603,7 +1603,7 @@ const DEFAULTS = {
 
 ## 14. Browser and Platform Compatibility
 
-### Runtime (`@adaptive/core`) — browser-based detection + runtime tier switching
+### Runtime (`@adaptive-bundle/core`) — browser-based detection + runtime tier switching
 
 Minimum browser support: any browser that supports dynamic `import()`.
 
@@ -1616,7 +1616,7 @@ The detection engine uses feature detection, not browser sniffing, for all hardw
 
 ### Runtime with `targetTier` — build-time tier resolution (no dynamic import required)
 
-When the Vite plugin is configured with `targetTier`, all `adaptive()` calls are compiled to static imports and `@adaptive/core` is not included in the output bundle. This mode supports **any browser that can run the app's baseline JavaScript**, including:
+When the Vite plugin is configured with `targetTier`, all `adaptive()` calls are compiled to static imports and `@adaptive-bundle/core` is not included in the output bundle. This mode supports **any browser that can run the app's baseline JavaScript**, including:
 
 - Chromium 38+ (older STBs like Sky Q, Foxtel iQ4)
 - Opera/Presto-based engines (legacy Tizen TVs)
@@ -1643,7 +1643,7 @@ This is the recommended mode for STB/CTV apps distributed to known platforms.
 
 For platforms without dynamic `import()`, `targetTier` is the only supported mode — but it's also the optimal one, since these platforms are known at build time and there's no benefit to runtime detection.
 
-### Build-Time (`@adaptive/vite-plugin`)
+### Build-Time (`@adaptive-bundle/vite-plugin`)
 
 Requires Vite 5.0+ and Node.js 18+. Uses Rollup's plugin API for chunk manipulation.
 
@@ -1656,12 +1656,12 @@ Adaptive is a **100% local, zero-telemetry, zero-network tool.** No data ever le
 Adaptive does not and will never:
 
 - **Send telemetry.** No usage analytics, no crash reports, no "anonymous" data collection. Not opt-in, not opt-out — it simply doesn't exist.
-- **Make network requests.** No package in the Adaptive ecosystem (`@adaptive/core`, `@adaptive/react`, `@adaptive/vite-plugin`, etc.) makes any HTTP request, WebSocket connection, or network call of any kind. The Vite plugin reads local source files. The runtime reads local browser APIs. That's it.
+- **Make network requests.** No package in the Adaptive ecosystem (`@adaptive-bundle/core`, `@adaptive-bundle/react`, `@adaptive-bundle/vite-plugin`, etc.) makes any HTTP request, WebSocket connection, or network call of any kind. The Vite plugin reads local source files. The runtime reads local browser APIs. That's it.
 - **Phone home on install.** No `postinstall` scripts that ping a server. No first-run telemetry. No update checks. npm handles versioning.
 - **Collect, store, or transmit device profiles.** The device profile (probes, score, tier) is computed locally in the user's browser and stored only in that browser's `localStorage`. It is never sent to a server, never aggregated, never shared across users.
 - **Include tracking pixels, beacons, or analytics.** Not in the runtime, not in the devtools, not in the HTML reports.
 
-**This is enforced structurally:** `@adaptive/core` has zero dependencies and zero network imports. There is no `fetch`, no `XMLHttpRequest`, no `navigator.sendBeacon` anywhere in the package. This is verified by automated checks in CI — any PR that adds a network-capable API to `@adaptive/core` is blocked.
+**This is enforced structurally:** `@adaptive-bundle/core` has zero dependencies and zero network imports. There is no `fetch`, no `XMLHttpRequest`, no `navigator.sendBeacon` anywhere in the package. This is verified by automated checks in CI — any PR that adds a network-capable API to `@adaptive-bundle/core` is blocked.
 
 ### Fingerprinting Disclosure
 
@@ -1695,7 +1695,7 @@ The absence of telemetry and network activity is auditable:
 
 - Run `grep -r "fetch\|XMLHttpRequest\|sendBeacon\|WebSocket\|navigator\.sendBeacon" packages/core/` — it must return zero results.
 - The CI pipeline includes a size and import audit that blocks any dependency or import that provides network capabilities.
-- The gzipped output of `@adaptive/core` is deterministic and reproducible — a hash change without a corresponding code change indicates tampering.
+- The gzipped output of `@adaptive-bundle/core` is deterministic and reproducible — a hash change without a corresponding code change indicates tampering.
 
 ## 16. Competitive Differentiation
 
@@ -1741,7 +1741,7 @@ The project should be measured by:
 
 1. **Adoption friction:** Time from `npm install` to first actionable insight (target: under 60 seconds — install, add plugin, run build, see report).
 2. **Real savings:** Average KB saved for low-tier devices across adopters (target: >100KB per app).
-3. **Runtime overhead:** Actual gzipped size of `@adaptive/core` (target: <3KB) and detection time (target: <50ms).
+3. **Runtime overhead:** Actual gzipped size of `@adaptive-bundle/core` (target: <3KB) and detection time (target: <50ms).
 4. **Tier accuracy:** Percentage of devices correctly classified when ground truth is available (target: >90% on Chrome, >80% on Safari/Firefox).
 5. **Developer retention:** Projects that add adaptive boundaries after seeing the Level 0 report (target: >30%).
 
@@ -1757,7 +1757,7 @@ The project should be measured by:
    - **Primary:** WebGL capability probing — create a small offscreen WebGL context and measure actual capabilities: `MAX_TEXTURE_SIZE`, `MAX_RENDERBUFFER_SIZE`, `MAX_VERTEX_TEXTURE_IMAGE_UNITS`, `MAX_FRAGMENT_UNIFORM_VECTORS`, and supported extensions count. These parameters directly reflect GPU capability without exposing the model name, are privacy-safe, stable across browser updates, and require zero maintenance. Map capability ranges to tiers (0-3) using empirically calibrated thresholds.
    - **Secondary:** WebGPU feature detection (`navigator.gpu`) when available — check `maxTextureDimension2D`, `maxBufferSize`, and supported features as tier indicators. This is future-proof and complements WebGL probing.
    - **Tertiary:** If neither WebGL nor WebGPU is available, skip GPU probe entirely and redistribute weight. GPU-less classification still works via CPU + memory + screen probes.
-   - No external fetches, no lookup tables, no quarterly updates. The capability thresholds are baked into `@adaptive/core` as a few dozen bytes of calibration constants.
+   - No external fetches, no lookup tables, no quarterly updates. The capability thresholds are baked into `@adaptive-bundle/core` as a few dozen bytes of calibration constants.
 
 ### Open Questions
 
@@ -1783,27 +1783,27 @@ The project follows a "do everything or nothing" quality philosophy — every sh
 
 ### Phase 1: Foundation (core value proposition)
 
-- `@adaptive/core` — Detection engine, scoring, tier resolution, caching
-- `@adaptive/react` — All three APIs (exclusion, two-variant, inline) + hooks
-- `@adaptive/vite-plugin` — Analysis, chunk isolation, reports (console + HTML + JSON + historical trend tracking), CI budgets, CLI (`analyze`, `simulate`, `init`, `report`, `validate`)
+- `@adaptive-bundle/core` — Detection engine, scoring, tier resolution, caching
+- `@adaptive-bundle/react` — All three APIs (exclusion, two-variant, inline) + hooks
+- `@adaptive-bundle/vite-plugin` — Analysis, chunk isolation, reports (console + HTML + JSON + historical trend tracking), CI budgets, CLI (`analyze`, `simulate`, `init`, `report`, `validate`)
 
 This phase delivers the full Level 0 → Level 3 experience for React + Vite projects. It must prove the product works and people want it before expanding.
 
 ### Phase 2: Framework Expansion
 
-- `@adaptive/vue` — Vue adapter
-- `@adaptive/svelte` — Svelte adapter
-- `@adaptive/core/server` — Server-side tier resolution (Client Hints, edge middleware helpers)
+- `@adaptive-bundle/vue` — Vue adapter
+- `@adaptive-bundle/svelte` — Svelte adapter
+- `@adaptive-bundle/core/server` — Server-side tier resolution (Client Hints, edge middleware helpers)
 
 ### Phase 3: Meta-Framework Integration
 
-- `@adaptive/next` — Next.js plugin (Webpack integration + middleware)
-- `@adaptive/nuxt` — Nuxt module (auto-configures Vite plugin + Nitro middleware)
+- `@adaptive-bundle/next` — Next.js plugin (Webpack integration + middleware)
+- `@adaptive-bundle/nuxt` — Nuxt module (auto-configures Vite plugin + Nitro middleware)
 - SvelteKit and Remix integration guides (these use Vite natively, so the standard plugin works — only server hooks need documentation)
 
 ### Phase 4: Developer Experience
 
-- `@adaptive/devtools` — Browser overlay + Vite dev server panel
+- `@adaptive-bundle/devtools` — Browser overlay + Vite dev server panel
 
 Each phase ships completely or not at all. No beta packages, no "partial support." A package is either production-ready or it doesn't exist yet.
 
@@ -1811,11 +1811,11 @@ Each phase ships completely or not at all. No beta packages, no "partial support
 
 All packages in the Adaptive monorepo share a **single version number** (synchronized versioning, like Vite and Angular). When any package releases, all packages release at the same version — even if some packages have no changes in that release.
 
-**Rationale:** Adaptive packages have tight cross-dependencies (`@adaptive/react` depends on `@adaptive/core`, `@adaptive/nuxt` depends on `@adaptive/vite-plugin`). Independent versioning creates combinatorial compatibility headaches ("does `@adaptive/react@2.3.1` work with `@adaptive/core@2.2.0`?"). Synchronized versions eliminate this entirely — if all packages are at `1.4.0`, they work together. Period.
+**Rationale:** Adaptive packages have tight cross-dependencies (`@adaptive-bundle/react` depends on `@adaptive-bundle/core`, `@adaptive-bundle/nuxt` depends on `@adaptive-bundle/vite-plugin`). Independent versioning creates combinatorial compatibility headaches ("does `@adaptive-bundle/react@2.3.1` work with `@adaptive-bundle/core@2.2.0`?"). Synchronized versions eliminate this entirely — if all packages are at `1.4.0`, they work together. Period.
 
 **Semver:** The version follows standard semver. A breaking change in any package bumps the major version for all packages. This creates social pressure to avoid unnecessary breaking changes in stable packages — which is the correct incentive.
 
-**Peer dependencies:** Framework adapters (`@adaptive/react`, `@adaptive/vue`, `@adaptive/svelte`) declare `@adaptive/core` as a peer dependency with the exact same version. The Vite plugin is always a dev dependency.
+**Peer dependencies:** Framework adapters (`@adaptive-bundle/react`, `@adaptive-bundle/vue`, `@adaptive-bundle/svelte`) declare `@adaptive-bundle/core` as a peer dependency with the exact same version. The Vite plugin is always a dev dependency.
 
 ## 20. Technology Stack
 
@@ -1824,10 +1824,10 @@ All packages in the Adaptive monorepo share a **single version number** (synchro
 ### Why TypeScript
 
 1. **Ecosystem requirement.** Vite plugins, Rollup hooks, React/Vue/Svelte adapters, and Next.js/Nuxt integrations are all JavaScript ecosystem tools. The plugin must speak Rollup's plugin API natively — there is no viable alternative language for this.
-2. **Size budget compliance.** `@adaptive/core` must be <3KB gzipped. TypeScript compiles to minimal JS with zero overhead. Languages that compile to WASM (Rust, Go) would blow the size budget on the WASM runtime alone (~10-50KB baseline).
+2. **Size budget compliance.** `@adaptive-bundle/core` must be <3KB gzipped. TypeScript compiles to minimal JS with zero overhead. Languages that compile to WASM (Rust, Go) would blow the size budget on the WASM runtime alone (~10-50KB baseline).
 3. **Developer readability.** Target users are React/Vue/Svelte developers who read TypeScript daily. AI models also have the deepest training data on TS/JS, making the codebase maximally accessible to both humans and AI-assisted development.
 4. **Type safety where it matters.** The `adaptive()` API has complex generic signatures (forwarding props between high/low variants, type-checking compatibility). TypeScript's type system handles this natively — the types ARE the documentation.
-5. **Dual-environment support.** `@adaptive/core` runs in browsers AND Node.js (via `@adaptive/core/server`). TypeScript with proper `exports` field in `package.json` handles this cleanly.
+5. **Dual-environment support.** `@adaptive-bundle/core` runs in browsers AND Node.js (via `@adaptive-bundle/core/server`). TypeScript with proper `exports` field in `package.json` handles this cleanly.
 
 ### Toolchain
 
@@ -1844,7 +1844,7 @@ All packages in the Adaptive monorepo share a **single version number** (synchro
 ### Why NOT other languages
 
 - **Rust/Go (for perf-critical parts):** Not needed. The heaviest operation is AST scanning in the Vite plugin (build-time, Node.js). Vite already uses esbuild (Go) and SWC/OXC (Rust) for parsing — the plugin hooks into the already-parsed module graph. Walking a dependency tree is milliseconds in plain TS.
-- **WASM modules:** The WASM runtime baseline (~10-50KB) exceeds the entire `@adaptive/core` budget (3KB). Disqualified by the size constraint alone.
+- **WASM modules:** The WASM runtime baseline (~10-50KB) exceeds the entire `@adaptive-bundle/core` budget (3KB). Disqualified by the size constraint alone.
 - **Plain JavaScript:** Loses type safety on the complex generic APIs (`adaptive()` config, probe normalization, weight redistribution). The type signatures are load-bearing — they prevent developer misuse at compile time.
 
 ## 21. Glossary
@@ -1867,6 +1867,6 @@ All packages in the Adaptive monorepo share a **single version number** (synchro
 - **Simulation:** A non-destructive analysis mode (`npx adaptive simulate`) that reports potential savings for a component without creating files or modifying code. Bridges the gap between seeing the report and committing to a boundary.
 - **Trend tracking:** Historical build data appended to `history.json` on each build, enabling progress visualization over time. Used in HTML reports to show cumulative optimization impact.
 - **Device map:** A static lookup table mapping platform identifiers (e.g., `sky-q`, `tizen-2020`) to tiers. Bypasses the scoring engine entirely for known STB/CTV platforms. Highest confidence, lowest cost detection path.
-- **Build-time tier targeting (`targetTier`):** A Vite plugin option that resolves the tier at compile time, tree-shaking unused variants and removing `@adaptive/core` from the output bundle. Essential for STB/CTV apps built per-platform, and the only supported mode for browsers without dynamic `import()`.
+- **Build-time tier targeting (`targetTier`):** A Vite plugin option that resolves the tier at compile time, tree-shaking unused variants and removing `@adaptive-bundle/core` from the output bundle. Essential for STB/CTV apps built per-platform, and the only supported mode for browsers without dynamic `import()`.
 - **STB (Set-Top Box):** A device connected to a TV that runs web applications via an embedded browser engine (typically old Chromium). Examples: Sky Q, Foxtel iQ, Orange SOP.
 - **CTV (Connected TV):** A smart TV with a built-in browser engine that runs web applications directly. Examples: LG webOS TVs, Samsung Tizen TVs.

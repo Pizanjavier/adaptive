@@ -12,7 +12,7 @@ When you already build separately per platform, runtime detection is unnecessary
 
 ```ts
 // vite.config.ts
-import { adaptive } from '@adaptive/vite-plugin';
+import { adaptive } from '@adaptive-bundle/vite-plugin';
 
 const platformTierMap: Record<string, 'high' | 'low'> = {
   'sky-q': 'low',
@@ -44,7 +44,7 @@ When `targetTier` is set:
 
 1. All `adaptive()` calls become **static imports** of the targeted variant
 2. `<Adaptive.High>` / `<Adaptive.Low>` blocks are statically resolved — the non-matching block is removed as dead code
-3. `@adaptive/core` is **not included** in the output bundle at all
+3. `@adaptive-bundle/core` is **not included** in the output bundle at all
 4. Works on devices without dynamic `import()` (Chromium <63)
 
 This is the recommended approach for per-platform STB/CTV builds.
@@ -58,7 +58,7 @@ This is the recommended approach for per-platform STB/CTV builds.
 When you ship one build to multiple STB/CTV platforms, a device map bypasses the scoring engine for known devices. It's a lookup table from platform identifier to tier.
 
 ```ts
-import { configure } from '@adaptive/core';
+import { configure } from '@adaptive-bundle/core';
 
 configure({
   deviceMap: {
@@ -143,11 +143,11 @@ configure({
 
 ## Choosing a Strategy
 
-| Criteria                         | `targetTier` | `deviceMap`        | Custom Probes |
-| -------------------------------- | ------------ | ------------------ | ------------- |
-| Build per platform               | Yes          | No                 | No            |
-| Single build, multiple platforms | No           | Yes                | Yes           |
-| Runtime cost                     | Zero         | Negligible         | ~50ms         |
-| `@adaptive/core` in bundle       | No           | Yes                | Yes           |
-| Works without dynamic `import()` | Yes          | No                 | No            |
-| Unknown devices supported        | No           | Fallback to probes | Yes           |
+| Criteria                          | `targetTier` | `deviceMap`        | Custom Probes |
+| --------------------------------- | ------------ | ------------------ | ------------- |
+| Build per platform                | Yes          | No                 | No            |
+| Single build, multiple platforms  | No           | Yes                | Yes           |
+| Runtime cost                      | Zero         | Negligible         | ~50ms         |
+| `@adaptive-bundle/core` in bundle | No           | Yes                | Yes           |
+| Works without dynamic `import()`  | Yes          | No                 | No            |
+| Unknown devices supported         | No           | Fallback to probes | Yes           |

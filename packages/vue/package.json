@@ -1,5 +1,8 @@
 {
-  "name": "@adaptive/vue",
+  "name": "@adaptive-bundle/vue",
+  "publishConfig": {
+    "access": "public"
+  },
   "version": "0.1.0",
   "description": "Vue adapter for Adaptive — adaptive() API, composables, and components",
   "type": "module",
@@ -29,11 +32,11 @@
     "clean": "rm -rf dist"
   },
   "peerDependencies": {
-    "@adaptive/core": "workspace:*",
+    "@adaptive-bundle/core": "workspace:*",
     "vue": ">=3.3.0"
   },
   "devDependencies": {
-    "@adaptive/core": "workspace:*",
+    "@adaptive-bundle/core": "workspace:*",
     "vue": "^3.4.0"
   },
   "sideEffects": false

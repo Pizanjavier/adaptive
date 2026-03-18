@@ -1,5 +1,5 @@
 import type { AdaptiveNuxtConfig } from './types.js';
-import { adaptive } from '@adaptive/vite-plugin';
+import { adaptive } from '@adaptive-bundle/vite-plugin';
 
 export interface NuxtModule {
   meta: { name: string; configKey: string };
@@ -25,7 +25,7 @@ interface ServerHandler {
 
 export function defineAdaptiveModule(): NuxtModule {
   return {
-    meta: { name: '@adaptive/nuxt', configKey: 'adaptive' },
+    meta: { name: '@adaptive-bundle/nuxt', configKey: 'adaptive' },
     defaults: { report: true, reportFormat: 'console', clientHints: true },
 
     setup(options: AdaptiveNuxtConfig, nuxt: NuxtInstance) {

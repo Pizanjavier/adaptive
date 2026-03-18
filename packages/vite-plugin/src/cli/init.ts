@@ -35,7 +35,7 @@ function createLiteScaffold(componentName: string, propsInterface: string | null
 
 function createAdaptiveWrapper(_componentName: string, highPath: string, litePath: string): string {
   return [
-    `import { adaptive } from '@adaptive/react';`,
+    `import { adaptive } from '@adaptive-bundle/react';`,
     '',
     `export default adaptive({`,
     `  high: () => import('${highPath}'),`,

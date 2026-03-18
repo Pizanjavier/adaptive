@@ -7,5 +7,5 @@ export default defineConfig({
   clean: true,
   treeshake: true,
   minify: true,
-  external: ['@adaptive/core'],
+  external: ['@adaptive-bundle/core'],
 });

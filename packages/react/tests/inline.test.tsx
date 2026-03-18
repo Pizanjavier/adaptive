@@ -4,7 +4,7 @@ import { Adaptive } from '../src/inline.js';
 
 let mockTier = 'high';
 
-vi.mock('@adaptive/core', () => ({
+vi.mock('@adaptive-bundle/core', () => ({
   getDeviceProfile: vi.fn(() => ({
     score: 0.7,
     confidence: 0.9,

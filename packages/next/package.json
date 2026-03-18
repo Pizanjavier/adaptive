@@ -1,5 +1,8 @@
 {
-  "name": "@adaptive/next",
+  "name": "@adaptive-bundle/next",
+  "publishConfig": {
+    "access": "public"
+  },
   "version": "0.1.0",
   "description": "Next.js integration for Adaptive — Webpack plugin for device-aware bundle optimization",
   "type": "module",
@@ -29,15 +32,15 @@
     "clean": "rm -rf dist"
   },
   "peerDependencies": {
-    "@adaptive/core": "workspace:*",
-    "@adaptive/react": "workspace:*",
-    "@adaptive/vite-plugin": "workspace:*",
+    "@adaptive-bundle/core": "workspace:*",
+    "@adaptive-bundle/react": "workspace:*",
+    "@adaptive-bundle/vite-plugin": "workspace:*",
     "next": ">=13.0.0"
   },
   "devDependencies": {
-    "@adaptive/core": "workspace:*",
-    "@adaptive/react": "workspace:*",
-    "@adaptive/vite-plugin": "workspace:*"
+    "@adaptive-bundle/core": "workspace:*",
+    "@adaptive-bundle/react": "workspace:*",
+    "@adaptive-bundle/vite-plugin": "workspace:*"
   },
   "sideEffects": false
 }

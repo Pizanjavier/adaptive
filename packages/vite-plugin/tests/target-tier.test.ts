@@ -98,38 +98,38 @@ describe('transformForTargetTier', () => {
   describe('import cleanup', () => {
     it('removes adaptive import when no longer used', () => {
       const source = [
-        `import { adaptive } from '@adaptive/react';`,
+        `import { adaptive } from '@adaptive-bundle/react';`,
         `const X = adaptive({ high: () => import('./A'), low: () => import('./B') });`,
       ].join('\n');
       const result = transformForTargetTier(source, 'test.tsx', makeConfig('high'))!;
-      expect(result).not.toContain('@adaptive/react');
+      expect(result).not.toContain('@adaptive-bundle/react');
     });
 
     it('preserves other imports from the same package', () => {
       const source = [
-        `import { adaptive, useTier } from '@adaptive/react';`,
+        `import { adaptive, useTier } from '@adaptive-bundle/react';`,
         `const X = adaptive({ high: () => import('./A'), low: () => import('./B') });`,
       ].join('\n');
       const result = transformForTargetTier(source, 'test.tsx', makeConfig('high'))!;
-      expect(result).toContain("import { useTier } from '@adaptive/react';");
+      expect(result).toContain("import { useTier } from '@adaptive-bundle/react';");
       expect(result).not.toContain('adaptive,');
     });
 
     it('removes Adaptive import when inline blocks are fully resolved', () => {
       const source = [
-        `import { Adaptive } from '@adaptive/react';`,
+        `import { Adaptive } from '@adaptive-bundle/react';`,
         `<Adaptive.High><Chart /></Adaptive.High>`,
         `<Adaptive.Low><Table /></Adaptive.Low>`,
       ].join('\n');
       const result = transformForTargetTier(source, 'test.tsx', makeConfig('high'))!;
-      expect(result).not.toContain('@adaptive/react');
+      expect(result).not.toContain('@adaptive-bundle/react');
     });
   });
 
   describe('combined transforms', () => {
     it('handles adaptive() calls and inline blocks in the same file', () => {
       const source = [
-        `import { adaptive, Adaptive } from '@adaptive/react';`,
+        `import { adaptive, Adaptive } from '@adaptive-bundle/react';`,
         `const Editor = adaptive({ high: () => import('./Rich'), low: () => import('./Basic') });`,
         `function App() {`,
         `  return <div>`,
@@ -143,7 +143,7 @@ describe('transformForTargetTier', () => {
       expect(result).toContain('const Editor = __adaptive_static_0;');
       expect(result).toContain('<Fancy />');
       expect(result).toContain('{null}');
-      expect(result).not.toContain('@adaptive/react');
+      expect(result).not.toContain('@adaptive-bundle/react');
     });
   });
 });

@@ -1,5 +1,5 @@
 import { defineAsyncComponent, defineComponent, h, type Component, type VNode } from 'vue';
-import { getDeviceProfile, type Tier } from '@adaptive/core';
+import { getDeviceProfile, type Tier } from '@adaptive-bundle/core';
 import { loadWithFallback } from './error-recovery.js';
 
 type ImportFn = () => Promise<{ default: Component }>;

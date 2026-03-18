@@ -1,5 +1,5 @@
 import { lazy, Suspense, type ReactNode, type ComponentType } from 'react';
-import { getDeviceProfile, type Tier } from '@adaptive/core';
+import { getDeviceProfile, type Tier } from '@adaptive-bundle/core';
 import { loadWithRetry } from './error-recovery.js';
 
 type ImportFn<M = unknown> = () => Promise<{ default: M }>;

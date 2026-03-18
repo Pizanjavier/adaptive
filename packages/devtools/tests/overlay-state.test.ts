@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import type { DeviceProfile } from '@adaptive/core';
+import type { DeviceProfile } from '@adaptive-bundle/core';
 
-vi.mock('@adaptive/core', () => ({
+vi.mock('@adaptive-bundle/core', () => ({
   getDeviceProfile: vi.fn<() => DeviceProfile>(() => ({
     score: 0.75,
     confidence: 0.9,

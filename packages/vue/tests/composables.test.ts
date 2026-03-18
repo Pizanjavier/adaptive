@@ -6,7 +6,7 @@ let mockTier = 'high';
 let mockScore = 0.7;
 let mockEffectiveType: string | null = '4g';
 
-vi.mock('@adaptive/core', () => ({
+vi.mock('@adaptive-bundle/core', () => ({
   getDeviceProfile: vi.fn(() => ({
     score: mockScore,
     confidence: 0.9,

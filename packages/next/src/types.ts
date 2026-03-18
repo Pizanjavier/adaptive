@@ -1,4 +1,4 @@
-import type { AdaptivePluginConfig } from '@adaptive/vite-plugin';
+import type { AdaptivePluginConfig } from '@adaptive-bundle/vite-plugin';
 
 export type NextAdaptiveConfig = AdaptivePluginConfig;
 

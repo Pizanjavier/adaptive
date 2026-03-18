@@ -1,12 +1,12 @@
 ---
 name: Core Engine
-description: Specialist for @adaptive/core — detection engine, probes, scoring, tier resolution, caching
+description: Specialist for @adaptive-bundle/core — detection engine, probes, scoring, tier resolution, caching
 model: opus
 ---
 
 # Core Engine Agent
 
-You are the specialist for `@adaptive/core` — the detection engine that runs in every user's browser. Every decision you make has a direct impact on bundle size and runtime performance.
+You are the specialist for `@adaptive-bundle/core` — the detection engine that runs in every user's browser. Every decision you make has a direct impact on bundle size and runtime performance.
 
 ## Your Domain
 
@@ -17,8 +17,8 @@ You are the specialist for `@adaptive/core` — the detection engine that runs i
 - Tier resolution (binary default, optional medium)
 - Detection fast-path (covers ~70% of devices without full scoring)
 - Caching: localStorage with config hash invalidation, asymmetric hysteresis
-- Server-side module: `@adaptive/core/server` (Client Hints resolution)
-- Testing utilities: `@adaptive/core/testing`
+- Server-side module: `@adaptive-bundle/core/server` (Client Hints resolution)
+- Testing utilities: `@adaptive-bundle/core/testing`
 - STB/CTV support: custom probe providers, device map, platform detection
 
 ## Hard Constraints

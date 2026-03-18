@@ -1,4 +1,4 @@
-import type { DeviceProfile, Tier } from '@adaptive/core';
+import type { DeviceProfile, Tier } from '@adaptive-bundle/core';
 
 export type OverlayPosition = 'bottom-right' | 'bottom-left' | 'top-right' | 'top-left';
 

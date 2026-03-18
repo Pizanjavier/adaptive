@@ -102,7 +102,7 @@ describe('AdaptiveWebpackPlugin', () => {
           resource: '/app/src/App.tsx',
           _source: {
             source: () => `
-              import { adaptive } from '@adaptive/react';
+              import { adaptive } from '@adaptive-bundle/react';
               const Dashboard = adaptive({
                 high: () => import('./DashboardHigh'),
                 low: () => import('./DashboardLow'),

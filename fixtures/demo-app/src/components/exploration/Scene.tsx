@@ -1,4 +1,4 @@
-import { adaptive } from '@adaptive/react';
+import { adaptive } from '@adaptive-bundle/react';
 
 const Scene = adaptive({
   high: () => import('./ThreeScene'),

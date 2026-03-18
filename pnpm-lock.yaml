@@ -50,13 +50,13 @@ importers:
 
   fixtures/demo-app:
     dependencies:
-      '@adaptive/core':
+      '@adaptive-bundle/core':
         specifier: workspace:*
         version: link:../../packages/core
-      '@adaptive/devtools':
+      '@adaptive-bundle/devtools':
         specifier: workspace:*
         version: link:../../packages/devtools
-      '@adaptive/react':
+      '@adaptive-bundle/react':
         specifier: workspace:*
         version: link:../../packages/react
       '@react-three/drei':
@@ -81,7 +81,7 @@ importers:
         specifier: ^0.164.0
         version: 0.164.1
     devDependencies:
-      '@adaptive/vite-plugin':
+      '@adaptive-bundle/vite-plugin':
         specifier: workspace:*
         version: link:../../packages/vite-plugin
       '@types/react':
@@ -107,7 +107,7 @@ importers:
 
   packages/devtools:
     devDependencies:
-      '@adaptive/core':
+      '@adaptive-bundle/core':
         specifier: workspace:*
         version: link:../core
 
@@ -117,13 +117,13 @@ importers:
         specifier: '>=13.0.0'
         version: 16.1.7(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
     devDependencies:
-      '@adaptive/core':
+      '@adaptive-bundle/core':
         specifier: workspace:*
         version: link:../core
-      '@adaptive/react':
+      '@adaptive-bundle/react':
         specifier: workspace:*
         version: link:../react
-      '@adaptive/vite-plugin':
+      '@adaptive-bundle/vite-plugin':
         specifier: workspace:*
         version: link:../vite-plugin
 
@@ -133,16 +133,16 @@ importers:
         specifier: '>=3.0.0'
         version: 4.4.2(@babel/core@7.29.0)(@babel/plugin-syntax-jsx@7.28.6(@babel/core@7.29.0))(@parcel/watcher@2.5.6)(@types/node@20.19.37)(@vue/compiler-sfc@3.5.30)(cac@6.7.14)(commander@13.1.0)(db0@0.3.4)(eslint@8.57.1)(ioredis@5.10.0)(magicast@0.5.2)(optionator@0.9.4)(rollup-plugin-visualizer@6.0.11(rollup@4.59.0))(rollup@4.59.0)(terser@5.46.1)(typescript@5.9.3)(vite@7.3.1(@types/node@20.19.37)(jiti@2.6.1)(terser@5.46.1)(yaml@2.8.2))(yaml@2.8.2)
     devDependencies:
-      '@adaptive/core':
+      '@adaptive-bundle/core':
         specifier: workspace:*
         version: link:../core
-      '@adaptive/vite-plugin':
+      '@adaptive-bundle/vite-plugin':
         specifier: workspace:*
         version: link:../vite-plugin
 
   packages/react:
     devDependencies:
-      '@adaptive/core':
+      '@adaptive-bundle/core':
         specifier: workspace:*
         version: link:../core
       '@types/react':
@@ -160,7 +160,7 @@ importers:
 
   packages/svelte:
     devDependencies:
-      '@adaptive/core':
+      '@adaptive-bundle/core':
         specifier: workspace:*
         version: link:../core
       svelte:
@@ -179,7 +179,7 @@ importers:
 
   packages/vue:
     devDependencies:
-      '@adaptive/core':
+      '@adaptive-bundle/core':
         specifier: workspace:*
         version: link:../core
       vue:

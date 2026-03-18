@@ -6,5 +6,10 @@ export default defineConfig({
   dts: true,
   clean: true,
   treeshake: true,
-  external: ['next', '@adaptive/core', '@adaptive/react', '@adaptive/vite-plugin'],
+  external: [
+    'next',
+    '@adaptive-bundle/core',
+    '@adaptive-bundle/react',
+    '@adaptive-bundle/vite-plugin',
+  ],
 });

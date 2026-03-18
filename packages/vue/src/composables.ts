@@ -4,7 +4,7 @@ import {
   type DeviceProfile,
   type Tier,
   type EffectiveType,
-} from '@adaptive/core';
+} from '@adaptive-bundle/core';
 import { ADAPTIVE_KEY } from './context.js';
 
 function resolveProfile(): DeviceProfile {

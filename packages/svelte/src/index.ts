@@ -12,4 +12,4 @@ export {
 } from './stores.js';
 
 export type { AdaptiveStoreValue, NetworkAwareStoreValue } from './stores.js';
-export type { DeviceProfile, Tier, EffectiveType } from '@adaptive/core';
+export type { DeviceProfile, Tier, EffectiveType } from '@adaptive-bundle/core';

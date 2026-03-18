@@ -1,5 +1,5 @@
 import React, { lazy, Suspense, type ComponentType, type ReactElement } from 'react';
-import { getDeviceProfile, type Tier } from '@adaptive/core';
+import { getDeviceProfile, type Tier } from '@adaptive-bundle/core';
 import { loadWithFallback } from './error-recovery.js';
 
 type ImportFn<P> = () => Promise<{ default: ComponentType<P> }>;
