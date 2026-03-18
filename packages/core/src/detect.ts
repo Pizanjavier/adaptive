@@ -13,6 +13,7 @@ import { computeScore } from './scoring.js';
 import { resolveTier } from './tier.js';
 import { applyHysteresis, writeCache } from './cache.js';
 import { getForcedTier } from './testing.js';
+import { setCapabilities, resetCapabilities } from './capabilities.js';
 
 let cachedProfile: DeviceProfile | null = null;
 
@@ -39,11 +40,21 @@ export function getDeviceProfile(): DeviceProfile {
 
   if (config.detectPlatform) {
     const platform = config.detectPlatform();
-    if (platform && config.deviceMap[platform]) {
-      const tier = config.deviceMap[platform];
-      reasoning.push(`Platform identified as ${platform} -> forced tier: ${tier} via device map`);
-      cachedProfile = buildProfile(tier, tier === 'high' ? 0.9 : 0.1, 1, reasoning);
-      return cachedProfile;
+    if (platform) {
+      const entry = config.platformTierMap[platform];
+      if (entry) {
+        setCapabilities(entry.capabilities ?? []);
+        const tier = entry.tier;
+        reasoning.push(`Platform ${platform} -> tier: ${tier} via platformTierMap`);
+        cachedProfile = buildProfile(tier, tier === 'high' ? 0.9 : 0.1, 1, reasoning);
+        return cachedProfile;
+      }
+      if (config.deviceMap[platform]) {
+        const tier = config.deviceMap[platform];
+        reasoning.push(`Platform identified as ${platform} -> forced tier: ${tier} via device map`);
+        cachedProfile = buildProfile(tier, tier === 'high' ? 0.9 : 0.1, 1, reasoning);
+        return cachedProfile;
+      }
     }
   }
 
@@ -138,6 +149,7 @@ export function getTier(): Tier {
 
 export function resetDetection(): void {
   cachedProfile = null;
+  resetCapabilities();
 }
 
 function buildProfile(

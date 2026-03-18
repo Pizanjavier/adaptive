@@ -34,6 +34,10 @@ export function configure(overrides: Partial<AdaptiveConfig>): void {
       ...DEFAULT_CONFIG.deviceMap,
       ...overrides.deviceMap,
     },
+    platformTierMap: {
+      ...DEFAULT_CONFIG.platformTierMap,
+      ...overrides.platformTierMap,
+    },
   };
 }
 

@@ -71,11 +71,36 @@ afterEach(() => clearForcedTier());
 
 Or via URL parameter: `?adaptive_tier=low`
 
+## Platform Capabilities
+
+For STB/CTV apps, `platformTierMap` extends the device map with per-device capabilities:
+
+```ts
+import { configure, getCapabilities } from '@adaptive-bundle/core';
+
+configure({
+  platformTierMap: {
+    'sky-q': { tier: 'low', capabilities: ['drm', 'dolby-vision'] },
+    'foxtel-iq4': { tier: 'low', capabilities: ['drm', 'hdr10'] },
+  },
+  detectPlatform: () => detectCurrentPlatform(),
+});
+
+// After detection
+getCapabilities(); // ['drm', 'dolby-vision'] on sky-q
+```
+
+`platformTierMap` takes priority over `deviceMap`. Capabilities are user-defined and used by the Vite plugin for build-time chunk pruning.
+
 ## API
 
 ### `getDeviceProfile(): DeviceProfile`
 
 Returns the full device profile including tier, score, confidence, all probe values, and network info.
+
+### `getCapabilities(): string[]`
+
+Returns the current platform's capabilities from `platformTierMap`. Empty array when using auto-detection.
 
 ### `resolveTierFromHeaders(headers): Tier`
 

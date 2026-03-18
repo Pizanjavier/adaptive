@@ -16,6 +16,10 @@ interface BaseConfig {
   name?: string;
   loading?: 'eager' | 'lazy' | 'viewport';
   onError?: (error: Error, boundaryName: string) => void;
+  /** Build-time only: capabilities required to include this boundary */
+  requires?: string[];
+  /** Build-time only: fallback import when required capabilities are missing */
+  capabilityFallback?: ImportFn;
 }
 
 interface ExclusionConfig extends BaseConfig {

@@ -24,6 +24,7 @@ const baseConfig: ResolvedConfig = {
   ssrDefaultTier: 'low',
   sizeOverrides: {},
   devtools: false,
+  platformTierMap: {},
 };
 
 describe('findOpportunities', () => {

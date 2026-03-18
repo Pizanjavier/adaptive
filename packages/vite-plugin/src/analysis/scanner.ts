@@ -35,6 +35,23 @@ function deriveName(filePath: string, line: number): string {
   return `${base}:${line}`;
 }
 
+function extractStringArray(block: string, propName: string): string[] | undefined {
+  const re = new RegExp(`${propName}\\s*:\\s*\\[`);
+  const match = re.exec(block);
+  if (!match) return undefined;
+  const start = match.index + match[0].length;
+  const end = block.indexOf(']', start);
+  if (end === -1) return undefined;
+  const content = block.slice(start, end);
+  const strings: string[] = [];
+  const strRe = /['"]([^'"]+)['"]/g;
+  let strMatch;
+  while ((strMatch = strRe.exec(content)) !== null) {
+    strings.push(strMatch[1]);
+  }
+  return strings.length > 0 ? strings : undefined;
+}
+
 function extractPropertyImport(block: string, propName: string): string | undefined {
   const re = new RegExp(`${propName}\\s*:\\s*\\(?\\s*\\)?\\s*=>?`);
   const match = re.exec(block);
@@ -67,6 +84,8 @@ function scanAdaptiveCalls(source: string, filePath: string): AdaptiveBoundary[]
     const mediumImport = extractPropertyImport(block, 'medium');
     const componentImport = extractPropertyImport(block, 'component');
     const lowFallbackImport = extractPropertyImport(block, 'lowFallback');
+    const requires = extractStringArray(block, 'requires');
+    const capabilityFallbackImport = extractPropertyImport(block, 'capabilityFallback');
 
     if (!highImport && !componentImport) continue;
 
@@ -79,6 +98,8 @@ function scanAdaptiveCalls(source: string, filePath: string): AdaptiveBoundary[]
       mediumImport,
       componentImport,
       lowFallbackImport,
+      requires,
+      capabilityFallbackImport,
     });
   }
 

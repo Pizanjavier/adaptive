@@ -52,6 +52,13 @@ adaptive({
 
   // STB/CTV: compile-time tier resolution (zero runtime cost)
   targetTier: 'low', // tree-shake to single tier
+
+  // Platform capabilities: build-time pruning based on device features
+  platformTierMap: {
+    'sky-q': { tier: 'low', capabilities: ['drm', 'dolby-vision'] },
+    'foxtel-iq4': { tier: 'low', capabilities: ['drm', 'hdr10'] },
+    ios: { tier: 'high', capabilities: ['haptics', 'webgl2'] },
+  },
 });
 ```
 

@@ -9,6 +9,7 @@ const DEFAULTS: ResolvedConfig = {
   ssrDefaultTier: 'low',
   sizeOverrides: {},
   devtools: true,
+  platformTierMap: {},
 };
 
 export function normalizeConfig(userConfig: AdaptivePluginConfig = {}): ResolvedConfig {
@@ -16,6 +17,7 @@ export function normalizeConfig(userConfig: AdaptivePluginConfig = {}): Resolved
     ...DEFAULTS,
     ...userConfig,
     sizeOverrides: { ...DEFAULTS.sizeOverrides, ...userConfig.sizeOverrides },
+    platformTierMap: { ...DEFAULTS.platformTierMap, ...userConfig.platformTierMap },
   };
 
   if (config.analysisSizeThreshold < 0) {

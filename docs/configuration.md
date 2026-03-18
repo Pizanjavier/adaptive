@@ -256,6 +256,40 @@ configure({
 
 When `detectPlatform()` returns a key in `deviceMap`, the tier resolves immediately with confidence 1.0 — no scoring, no probing, no WebGL.
 
+### Platform Tier Map (with Capabilities)
+
+An extended version of `deviceMap` that adds per-device capabilities for build-time chunk pruning:
+
+```ts
+configure({
+  platformTierMap: {
+    'sky-q': { tier: 'low', capabilities: ['drm', 'dolby-vision'] },
+    'foxtel-iq4': { tier: 'low', capabilities: ['drm', 'hdr10'] },
+    'sky-glass': { tier: 'high', capabilities: ['drm', 'dolby-vision', 'dolby-atmos'] },
+  },
+  detectPlatform: () => detectCurrentPlatform(),
+});
+```
+
+| Option                             | Type                                | Description                         |
+| ---------------------------------- | ----------------------------------- | ----------------------------------- |
+| `platformTierMap`                  | `Record<string, PlatformTierEntry>` | Map of platform ID to tier + caps   |
+| `platformTierMap[id].tier`         | `'high' \| 'low' \| 'medium'`       | Device tier                         |
+| `platformTierMap[id].capabilities` | `string[]`                          | Optional list of supported features |
+
+`platformTierMap` takes priority over `deviceMap` when both contain the same key. Capabilities are used by the Vite plugin's `requires` pruning and accessible at runtime via `getCapabilities()`.
+
+The same `platformTierMap` should be passed to the Vite plugin config for build-time pruning:
+
+```ts
+// vite.config.ts
+adaptive({
+  platformTierMap: {
+    /* same entries */
+  },
+});
+```
+
 ### Custom Probe Providers
 
 For STB/CTV devices with native JS bridges that expose hardware info:
@@ -329,19 +363,21 @@ const Editor = adaptive({
 });
 ```
 
-| Option        | Type                                  | Default      | Description                              |
-| ------------- | ------------------------------------- | ------------ | ---------------------------------------- |
-| `component`   | `() => Promise<{default: Component}>` | —            | Heavy component (exclusion pattern)      |
-| `high`        | `() => Promise<{default: Component}>` | —            | High-tier variant (two-variant pattern)  |
-| `low`         | `() => Promise<{default: Component}>` | —            | Low-tier variant (two-variant pattern)   |
-| `medium`      | `() => Promise<{default: Component}>` | —            | Medium-tier variant (opt-in)             |
-| `lowFallback` | `ReactElement \| null`                | —            | Rendered on low-tier (exclusion pattern) |
-| `fallback`    | `ReactElement`                        | —            | Loading skeleton                         |
-| `layout`      | `{ width?, height?, aspectRatio? }`   | —            | CLS-preventing layout hints              |
-| `name`        | `string`                              | —            | Boundary identifier for reports/devtools |
-| `loading`     | `'eager' \| 'lazy' \| 'viewport'`     | `'viewport'` | Loading strategy                         |
-| `thresholds`  | `{ high?: number, low?: number }`     | —            | Override global tier thresholds          |
-| `onError`     | `(error, name) => void`               | —            | Error callback                           |
+| Option               | Type                                  | Default      | Description                                     |
+| -------------------- | ------------------------------------- | ------------ | ----------------------------------------------- |
+| `component`          | `() => Promise<{default: Component}>` | —            | Heavy component (exclusion pattern)             |
+| `high`               | `() => Promise<{default: Component}>` | —            | High-tier variant (two-variant pattern)         |
+| `low`                | `() => Promise<{default: Component}>` | —            | Low-tier variant (two-variant pattern)          |
+| `medium`             | `() => Promise<{default: Component}>` | —            | Medium-tier variant (opt-in)                    |
+| `lowFallback`        | `ReactElement \| null`                | —            | Rendered on low-tier (exclusion pattern)        |
+| `fallback`           | `ReactElement`                        | —            | Loading skeleton                                |
+| `layout`             | `{ width?, height?, aspectRatio? }`   | —            | CLS-preventing layout hints                     |
+| `name`               | `string`                              | —            | Boundary identifier for reports/devtools        |
+| `loading`            | `'eager' \| 'lazy' \| 'viewport'`     | `'viewport'` | Loading strategy                                |
+| `thresholds`         | `{ high?: number, low?: number }`     | —            | Override global tier thresholds                 |
+| `onError`            | `(error, name) => void`               | —            | Error callback                                  |
+| `requires`           | `string[]`                            | —            | Capabilities required (build-time pruning)      |
+| `capabilityFallback` | `() => Promise<{default: Component}>` | —            | Fallback when required capabilities are missing |
 
 ---
 

@@ -244,3 +244,52 @@ This document tracks all user requests and AI outputs during development, servin
 - **Created `fixtures/demo-app/README.md`** — architecture, pages, patterns, dependencies, features
 - **Updated parent `README.md`** — added Demo App section with link
 - All **193 tests** pass across 8 packages
+
+### #017 — Platform Capabilities (Build-Time Pruning)
+
+**Date:** 2026-03-18
+**Request:** Implement capability-based differentiation within tiers. Devices in the same tier may have different features (e.g., foxtel-iq4 and sky-q are both low but support different codecs). Design a hybrid build-time + minimal runtime system.
+**Output:**
+
+- **Design decisions (user-confirmed):**
+  - Capabilities are user-defined only (no auto-detection — keeps core tiny)
+  - Build-time pruning is the main feature (`requires` + `capabilityFallback`)
+  - Runtime is minimal: `getCapabilities()` returning `string[]`
+  - Auto-detection mode (no platformTierMap) ignores `requires`, generates all chunks
+  - Fallback property named `capabilityFallback` to avoid collision with existing `fallback: ReactElement`
+- **@adaptive-bundle/core** (+89 bytes gzipped, 2828/3072):
+  - `types.ts` — Added `PlatformTierEntry` interface, `platformTierMap` on `AdaptiveConfig`
+  - `capabilities.ts` — NEW: 13-line module with `setCapabilities`, `getCapabilities`, `resetCapabilities`
+  - `detect.ts` — `platformTierMap` lookup before `deviceMap` fallback, sets capabilities on match
+  - `config.ts` — Merges `platformTierMap` in `configure()`
+  - `index.ts` — Exports `getCapabilities` and `PlatformTierEntry` type
+- **@adaptive-bundle/vite-plugin:**
+  - `types.ts` — Added `PlatformEntry`, `platformTierMap` on config, `requires`/`capabilityFallbackImport` on boundary, `pruned` on analysis
+  - `config.ts` — Added `platformTierMap: {}` default
+  - `analysis/scanner.ts` — `extractStringArray()` for `requires`, `extractPropertyImport` for `capabilityFallback`
+  - `analysis/capabilities.ts` — NEW: `buildCapabilityMap()`, `shouldPruneTier()`, `applyCapabilityPruning()`
+  - `analysis/index.ts` — Integrated pruning into `analyzeBoundaries()` pipeline
+  - `reports/console.ts` — Shows `PRUNED for <tier>: missing <capability>` in build reports
+- **Framework adapters** (React, Vue, Svelte):
+  - Added `requires?: string[]` and `capabilityFallback` to BaseConfig types (build-time only, runtime ignores)
+  - Re-exported `getCapabilities` from core for convenience
+- **@adaptive-bundle/devtools:**
+  - `types.ts` — Added `capabilities: string[]` to `OverlayState`
+  - `overlay/state.ts` — Reads `getCapabilities()` into state
+  - `overlay/render.ts` — New capabilities section with tags, shown when non-empty
+  - `overlay/styles.ts` — `.cap-tag` styles
+- **Demo app:**
+  - Added `platformTierMap` to vite config with fictional STB devices
+  - New `/capabilities` page with `MediaPlayer` boundary using `requires: ['dolby-atmos']`
+  - New components: `DolbyPlayer.tsx`, `StandardPlayer.tsx`, `MediaBoundary.tsx`
+- **Tests:**
+  - `core/tests/capabilities.test.ts` — getCapabilities default, platformTierMap resolution, reset, priority over deviceMap
+  - `vite-plugin/tests/capabilities.test.ts` — buildCapabilityMap, shouldPruneTier, applyCapabilityPruning
+  - `vite-plugin/tests/scanner.test.ts` — Tests for `requires` and `capabilityFallback` extraction
+- **Documentation:**
+  - `SPEC.md` — New "Platform Capabilities" subsection under 6.5
+  - `README.md` — Added "Platform Capabilities" section under STB/CTV
+  - `docs/configuration.md` — Added `platformTierMap` config reference, per-boundary options
+  - `docs/stb-ctv.md` — New "Platform Capabilities" section
+  - `packages/core/README.md` — Added capabilities section and `getCapabilities()` API reference
+  - `packages/vite-plugin/README.md` — Added `platformTierMap` to config example

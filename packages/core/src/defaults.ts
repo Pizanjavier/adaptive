@@ -17,6 +17,7 @@ export const DEFAULT_CONFIG: AdaptiveConfig = {
   forceTierParam: 'adaptive_tier',
   probeProviders: {},
   deviceMap: {},
+  platformTierMap: {},
   detectPlatform: null,
   configHash: '',
 };

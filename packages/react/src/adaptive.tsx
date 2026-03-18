@@ -16,6 +16,10 @@ interface BaseConfig {
   name?: string;
   loading?: 'eager' | 'lazy' | 'viewport';
   onError?: (error: Error, boundaryName: string) => void;
+  /** Build-time only: capabilities required to include this component. Pruned by vite plugin. */
+  requires?: string[];
+  /** Build-time only: fallback import when required capabilities are missing. Pruned by vite plugin. */
+  capabilityFallback?: ImportFn<Record<string, unknown>>;
 }
 
 interface ExclusionConfig<P> extends BaseConfig {

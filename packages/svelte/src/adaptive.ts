@@ -8,11 +8,15 @@ interface BaseConfig {
   name?: string;
   loading?: 'eager' | 'lazy' | 'viewport';
   onError?: (error: Error, boundaryName: string) => void;
+  /** Build-time only: capabilities required to include this boundary */
+  requires?: string[];
 }
 
 interface ExclusionConfig<T> extends BaseConfig {
   component: ImportFn<T>;
   lowFallback?: null;
+  /** Build-time only: fallback import when required capabilities are missing */
+  capabilityFallback?: ImportFn<T>;
 }
 
 interface VariantConfig<T> extends BaseConfig {
@@ -20,6 +24,8 @@ interface VariantConfig<T> extends BaseConfig {
   low: ImportFn<T>;
   medium?: ImportFn<T>;
   thresholds?: { high?: number; low?: number };
+  /** Build-time only: fallback import when required capabilities are missing */
+  capabilityFallback?: ImportFn<T>;
 }
 
 type AdaptiveConfig<T> = ExclusionConfig<T> | VariantConfig<T>;

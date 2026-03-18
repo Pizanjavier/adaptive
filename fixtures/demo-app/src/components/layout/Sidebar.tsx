@@ -43,6 +43,14 @@ export function Sidebar() {
           </svg>
           Editor
         </NavLink>
+
+        <NavLink to="/capabilities">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+            <circle cx="8" cy="8" r="6.5" stroke="currentColor" strokeWidth="1.5" />
+            <path d="M5 8L7 10L11 6" stroke="currentColor" strokeWidth="1.5" />
+          </svg>
+          Capabilities
+        </NavLink>
       </nav>
 
       <div className="sidebar-footer">

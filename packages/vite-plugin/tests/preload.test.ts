@@ -12,6 +12,7 @@ function makeConfig(overrides: Partial<ResolvedConfig> = {}): ResolvedConfig {
     ssrDefaultTier: 'low',
     sizeOverrides: {},
     devtools: false,
+    platformTierMap: {},
     ...overrides,
   };
 }

@@ -114,6 +114,77 @@ configure({
 
 ---
 
+## Platform Capabilities
+
+Devices within the same tier may support different features. `platformTierMap` extends `deviceMap` with per-device **capabilities** — user-defined string tags that enable build-time chunk pruning.
+
+### Configuration
+
+Use `platformTierMap` in both the Vite plugin config (build-time pruning) and core config (runtime resolution):
+
+```ts
+// vite.config.ts — enables build-time pruning
+adaptive({
+  platformTierMap: {
+    'sky-q': { tier: 'low', capabilities: ['drm', 'dolby-vision'] },
+    'foxtel-iq4': { tier: 'low', capabilities: ['drm', 'hdr10'] },
+    'sky-glass': { tier: 'high', capabilities: ['drm', 'dolby-vision', 'dolby-atmos'] },
+    'foxtel-iq5': { tier: 'high', capabilities: ['drm', 'hdr10'] },
+  },
+});
+```
+
+```ts
+// Runtime — same map for capability resolution
+import { configure } from '@adaptive-bundle/core';
+
+configure({
+  platformTierMap: {
+    'sky-q': { tier: 'low', capabilities: ['drm', 'dolby-vision'] },
+    'foxtel-iq4': { tier: 'low', capabilities: ['drm', 'hdr10'] },
+    'sky-glass': { tier: 'high', capabilities: ['drm', 'dolby-vision', 'dolby-atmos'] },
+    'foxtel-iq5': { tier: 'high', capabilities: ['drm', 'hdr10'] },
+  },
+  detectPlatform: () => detectCurrentPlatform(),
+});
+```
+
+### Build-Time Pruning
+
+Declare `requires` on an `adaptive()` boundary. The plugin prunes the chunk for tiers where no device has the required capabilities:
+
+```tsx
+const DolbyPlayer = adaptive({
+  high: () => import('./DolbyPlayer'),
+  low: () => import('./DolbyPlayer'),
+  requires: ['dolby-vision'],
+  capabilityFallback: () => import('./StandardPlayer'),
+});
+```
+
+With the config above:
+
+- **low tier:** sky-q has `dolby-vision` → chunk generated
+- **high tier:** sky-glass has `dolby-vision` → chunk generated
+- If no device in a tier had `dolby-vision` → replaced with `StandardPlayer`
+
+The build report shows pruned boundaries: `PRUNED for high: missing dolby-vision`.
+
+### Runtime Access
+
+```ts
+import { getCapabilities } from '@adaptive-bundle/core';
+const caps = getCapabilities(); // ['drm', 'dolby-vision'] or []
+```
+
+Returns the current platform's capabilities. Empty array when using auto-detection or when the platform has no declared capabilities.
+
+### Interaction with `deviceMap`
+
+`platformTierMap` and `deviceMap` coexist. When both contain the same platform key, `platformTierMap` takes priority. Use `platformTierMap` when you need capabilities; use `deviceMap` for simple tier-only mappings.
+
+---
+
 ## CTV Probe Weight Recommendations
 
 Several default probes behave differently on STB/CTV devices:

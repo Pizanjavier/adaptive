@@ -82,6 +82,46 @@ const X = adaptive({
     expect(results[0].line).toBe(3);
   });
 
+  it('extracts requires array from adaptive() calls', () => {
+    const source = `
+const Player = adaptive({
+  high: () => import('./PlayerHigh'),
+  low: () => import('./PlayerLow'),
+  requires: ['dolby-vision', 'hdr10'],
+});
+`;
+    const results = scanSource(source, 'src/Player.tsx');
+    expect(results).toHaveLength(1);
+    expect(results[0].requires).toEqual(['dolby-vision', 'hdr10']);
+  });
+
+  it('extracts capabilityFallbackImport from adaptive() calls', () => {
+    const source = `
+const Player = adaptive({
+  high: () => import('./PlayerHigh'),
+  low: () => import('./PlayerLow'),
+  requires: ['dolby-vision'],
+  capabilityFallback: () => import('./StandardPlayer'),
+});
+`;
+    const results = scanSource(source, 'src/Player.tsx');
+    expect(results).toHaveLength(1);
+    expect(results[0].capabilityFallbackImport).toBe('./StandardPlayer');
+  });
+
+  it('boundaries without requires have undefined requires', () => {
+    const source = `
+const Widget = adaptive({
+  high: () => import('./WidgetHigh'),
+  low: () => import('./WidgetLow'),
+});
+`;
+    const results = scanSource(source, 'src/Widget.tsx');
+    expect(results).toHaveLength(1);
+    expect(results[0].requires).toBeUndefined();
+    expect(results[0].capabilityFallbackImport).toBeUndefined();
+  });
+
   it('handles medium variant', () => {
     const source = `
 const Widget = adaptive({

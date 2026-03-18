@@ -16,6 +16,7 @@ vi.mock('@adaptive-bundle/core', () => ({
     network: { effectiveType: '4g', dataSaver: false },
     reasoning: ['Score: 0.75'],
   })),
+  getCapabilities: vi.fn<() => string[]>(() => []),
 }));
 
 import { collectState } from '../src/overlay/state.js';

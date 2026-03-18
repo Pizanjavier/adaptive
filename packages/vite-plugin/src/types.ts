@@ -5,6 +5,11 @@ export interface BudgetConfig {
   enforce?: 'error' | 'warn';
 }
 
+export interface PlatformEntry {
+  tier: 'high' | 'low' | 'medium';
+  capabilities?: string[];
+}
+
 export interface AdaptivePluginConfig {
   analysisSizeThreshold?: number;
   report?: boolean;
@@ -16,6 +21,7 @@ export interface AdaptivePluginConfig {
   sizeOverrides?: Record<string, number>;
   budget?: BudgetConfig;
   devtools?: boolean;
+  platformTierMap?: Record<string, PlatformEntry>;
 }
 
 export interface ResolvedConfig {
@@ -29,6 +35,7 @@ export interface ResolvedConfig {
   sizeOverrides: Record<string, number>;
   budget?: BudgetConfig;
   devtools: boolean;
+  platformTierMap: Record<string, PlatformEntry>;
 }
 
 export interface AdaptiveBoundary {
@@ -40,6 +47,8 @@ export interface AdaptiveBoundary {
   mediumImport?: string;
   componentImport?: string;
   lowFallbackImport?: string;
+  requires?: string[];
+  capabilityFallbackImport?: string;
 }
 
 export interface DependencyInfo {
@@ -57,6 +66,7 @@ export interface BoundaryAnalysis {
   sharedDeps: DependencyInfo[];
   savings: number;
   savingsPercent: number;
+  pruned?: { tier: string; reason: string }[];
 }
 
 export interface ModuleInfo {

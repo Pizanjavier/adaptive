@@ -24,12 +24,20 @@ function fmtBoundary(a: BoundaryAnalysis, i: number): string {
   const s = fmtKB(a.savings);
   const pct = a.savingsPercent.toFixed(1);
 
-  return [
+  const lines = [
     `  ${i + 1}. ${a.boundary.name} (${loc})`,
     `     \u251C\u2500 high: ${h} ${fmtDeps(a.exclusiveHighDeps)}`,
     `     \u251C\u2500 low:  ${l} ${fmtDeps(a.exclusiveLowDeps)}`,
-    `     \u2514\u2500 Savings for low-tier: ${s} (${pct}%)`,
-  ].join('\n');
+  ];
+
+  if (a.pruned && a.pruned.length > 0) {
+    for (const p of a.pruned) {
+      lines.push(`     \u251C\u2500 PRUNED for ${p.tier}: ${p.reason}`);
+    }
+  }
+
+  lines.push(`     \u2514\u2500 Savings for low-tier: ${s} (${pct}%)`);
+  return lines.join('\n');
 }
 
 function computeTotals(analyses: BoundaryAnalysis[]) {

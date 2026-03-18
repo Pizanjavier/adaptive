@@ -1,4 +1,4 @@
-import { getDeviceProfile } from '@adaptive-bundle/core';
+import { getDeviceProfile, getCapabilities } from '@adaptive-bundle/core';
 import type { Tier } from '@adaptive-bundle/core';
 import type { BoundaryDecision, OverlayState } from '../types.js';
 
@@ -43,5 +43,6 @@ export function collectState(): OverlayState {
     profile,
     boundaries: scanBoundaries(),
     forcedTier: readForcedTier(),
+    capabilities: getCapabilities(),
   };
 }

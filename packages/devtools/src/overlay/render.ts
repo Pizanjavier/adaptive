@@ -53,6 +53,15 @@ function renderBoundaries(state: OverlayState): string {
     .join('');
 }
 
+function renderCapabilities(state: OverlayState): string {
+  if (state.capabilities.length === 0) return '';
+  const caps = state.capabilities.map((c) => `<span class="cap-tag">${esc(c)}</span>`).join(' ');
+  return `<div class="section">
+    <div class="section-title">Capabilities</div>
+    <div class="caps-list">${caps}</div>
+  </div>`;
+}
+
 function renderReasoning(state: OverlayState): string {
   return state.profile.reasoning.map((r) => `<div class="reasoning-item">${esc(r)}</div>`).join('');
 }
@@ -83,6 +92,8 @@ export function renderOverlay(state: OverlayState): string {
       <div class="section-title">Probes</div>
       ${renderProbes(state)}
     </div>
+
+    ${renderCapabilities(state)}
 
     <div class="section">
       <div class="section-title">Reasoning</div>

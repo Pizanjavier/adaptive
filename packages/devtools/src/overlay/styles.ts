@@ -138,6 +138,17 @@ export const OVERLAY_STYLES = `
 .collapsed .body { display: none; }
 .collapsed .panel { width: auto; }
 
+.caps-list { display: flex; flex-wrap: wrap; gap: 4px; }
+
+.cap-tag {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 11px;
+  background: rgba(56, 189, 248, 0.15);
+  color: #38bdf8;
+}
+
 .reasoning-item {
   font-size: 11px;
   color: #94a3b8;

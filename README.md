@@ -279,6 +279,39 @@ adaptive({
 PLATFORM=foxtel pnpm build   # low-tier-only bundle, no @adaptive-bundle/core
 ```
 
+### Platform Capabilities
+
+For devices within the same tier that support different features, `platformTierMap` adds capability-based build-time pruning:
+
+```ts
+adaptive({
+  platformTierMap: {
+    'foxtel-iq4': { tier: 'low', capabilities: ['drm', 'hdr10'] },
+    'sky-q': { tier: 'low', capabilities: ['drm', 'dolby-vision'] },
+    ios: { tier: 'high', capabilities: ['haptics', 'webgl2'] },
+    android: { tier: 'high', capabilities: ['webgl2', 'nfc'] },
+  },
+});
+```
+
+Components declare required capabilities — the plugin prunes chunks at build time when no device in a tier supports them:
+
+```tsx
+const DolbyPlayer = adaptive({
+  high: () => import('./DolbyPlayer'),
+  low: () => import('./DolbyPlayer'),
+  requires: ['dolby-vision'],
+  capabilityFallback: () => import('./StandardPlayer'),
+});
+```
+
+At runtime, query the resolved capabilities:
+
+```ts
+import { getCapabilities } from '@adaptive-bundle/core';
+const caps = getCapabilities(); // ['drm', 'dolby-vision'] or []
+```
+
 ## CLI
 
 The plugin ships a CLI for standalone analysis, scaffolding, and validation:

@@ -40,6 +40,11 @@ export interface ProbeProvider {
   (): { score: number; confidence: number } | null;
 }
 
+export interface PlatformTierEntry {
+  tier: Tier;
+  capabilities?: string[];
+}
+
 export interface AdaptiveConfig {
   weights: WeightConfig;
   threshold: number;
@@ -52,6 +57,7 @@ export interface AdaptiveConfig {
   probeProviders: Record<string, ProbeProvider>;
   deviceMap: Record<string, Tier>;
   detectPlatform: (() => string | null) | null;
+  platformTierMap: Record<string, PlatformTierEntry>;
   configHash: string;
 }
 

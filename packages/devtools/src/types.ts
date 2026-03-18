@@ -17,6 +17,7 @@ export interface OverlayState {
   profile: DeviceProfile;
   boundaries: BoundaryDecision[];
   forcedTier: Tier | null;
+  capabilities: string[];
 }
 
 export interface OverlayInstance {

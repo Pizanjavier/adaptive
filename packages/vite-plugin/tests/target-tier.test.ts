@@ -12,6 +12,7 @@ function makeConfig(targetTier?: 'high' | 'low'): ResolvedConfig {
     ssrDefaultTier: 'low',
     sizeOverrides: {},
     devtools: false,
+    platformTierMap: {},
     targetTier,
   };
 }

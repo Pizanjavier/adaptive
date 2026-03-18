@@ -71,7 +71,12 @@ export function adaptive(userConfig?: AdaptivePluginConfig): Plugin {
         getModuleIds: () => ctx.getModuleIds(),
       };
       const boundaries = scanAllModules(graph as never);
-      analyses = analyzeBoundaries(boundaries, graph as never, config.sizeOverrides);
+      analyses = analyzeBoundaries(
+        boundaries,
+        graph as never,
+        config.sizeOverrides,
+        config.platformTierMap,
+      );
       opportunities = findOpportunities(graph as never, boundaries, config);
     },
 
@@ -120,6 +125,7 @@ export type {
   ResolvedConfig,
   ModuleGraph,
   ModuleInfo,
+  PlatformEntry,
 } from './types.js';
 
 export { normalizeConfig } from './config.js';

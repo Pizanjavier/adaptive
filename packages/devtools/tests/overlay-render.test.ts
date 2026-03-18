@@ -23,6 +23,7 @@ function createState(overrides: Partial<OverlayState> = {}): OverlayState {
       { name: 'Map', loadedVariant: 'medium', hasError: false },
     ],
     forcedTier: null,
+    capabilities: [],
     ...overrides,
   };
 }

@@ -844,6 +844,68 @@ configure({
 
 However, for CTV apps the **device map or build-time targeting is strongly preferred** over browser-based scoring. Browser probes are the fallback, not the primary detection path.
 
+#### Platform Capabilities (Build-Time Pruning)
+
+Beyond tier classification, devices within the same tier may have different feature support. A `platformTierMap` extends the static device map with **user-defined capabilities** — string tags that describe what each device supports. These capabilities enable build-time chunk pruning: when a component declares `requires: ['dolby-vision']` and no device in a tier has that capability, the chunk for that tier is replaced with a `capabilityFallback` at build time.
+
+**Configuration:**
+
+```ts
+import { configure } from '@adaptive-bundle/core';
+
+configure({
+  platformTierMap: {
+    'foxtel-iq4': { tier: 'low', capabilities: ['drm', 'hdr10'] },
+    'sky-q': { tier: 'low', capabilities: ['drm', 'dolby-vision'] },
+    ios: { tier: 'high', capabilities: ['haptics', 'webgl2'] },
+    android: { tier: 'high', capabilities: ['webgl2', 'nfc'] },
+  },
+  detectPlatform: () => detectCurrentPlatform(),
+});
+```
+
+When `detectPlatform()` returns a platform that exists in `platformTierMap`, the tier is resolved immediately (same as `deviceMap`) AND the platform's capabilities are stored for runtime access via `getCapabilities()`.
+
+`platformTierMap` takes priority over `deviceMap` when both contain the same platform key.
+
+**Build-time pruning with `requires` + `capabilityFallback`:**
+
+```tsx
+const DolbyPlayer = adaptive({
+  high: () => import('./DolbyPlayer'),
+  low: () => import('./DolbyPlayer'),
+  requires: ['dolby-vision'],
+  capabilityFallback: () => import('./StandardPlayer'),
+  name: 'DolbyPlayer',
+});
+```
+
+At build time, the Vite plugin:
+
+1. Scans `adaptive()` calls for `requires` arrays.
+2. Cross-references with capabilities declared in `platformTierMap` per tier.
+3. For each tier, if **no** device in that tier has **all** required capabilities, the tier's import is replaced with `capabilityFallback`.
+4. If no `capabilityFallback` is provided, the pruned tier's import is removed entirely.
+5. If no `platformTierMap` is configured (auto-detection mode), `requires` is ignored and all chunks are generated.
+
+The build report annotates pruned boundaries: `PRUNED for high: missing dolby-vision`.
+
+**Runtime API (minimal):**
+
+```ts
+import { getCapabilities } from '@adaptive-bundle/core';
+
+const caps = getCapabilities(); // ['drm', 'dolby-vision'] or []
+```
+
+`getCapabilities()` returns the capabilities of the current platform as resolved from `platformTierMap`. Returns an empty array when using auto-detection or when the platform has no declared capabilities. This is a raw data accessor — Adaptive does not provide hooks or feature-flag abstractions on top. Users wire their own runtime logic if needed.
+
+**Interaction with other features:**
+
+- `platformTierMap` and `deviceMap` coexist. `platformTierMap` is checked first.
+- `targetTier` build-time targeting works independently — capability pruning runs before `targetTier` transformation.
+- The devtools overlay shows active capabilities when available.
+
 ### 6.6 Multiple Boundaries on a Single Page
 
 When a page contains multiple adaptive boundaries, loading all variant chunks simultaneously can create a bandwidth waterfall — especially on slow connections where the device is high-tier but the network is constrained.

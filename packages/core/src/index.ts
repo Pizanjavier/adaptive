@@ -1,5 +1,6 @@
 export { configure, getConfig, resetConfig } from './config.js';
 export { getDeviceProfile, getTier, resetDetection } from './detect.js';
+export { getCapabilities } from './capabilities.js';
 
 export type {
   DeviceProfile,
@@ -16,4 +17,5 @@ export type {
   FastPathResult,
   NormalizedProbe,
   ProbeResult,
+  PlatformTierEntry,
 } from './types.js';
