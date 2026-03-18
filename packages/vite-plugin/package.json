@@ -4,7 +4,7 @@
     "access": "public"
   },
   "version": "0.1.0",
-  "description": "Vite plugin for device-aware bundle optimization",
+  "description": "Vite plugin for device-aware bundle optimization — analyzes dependencies, splits chunks by device tier, generates reports, and enforces CI budgets.",
   "type": "module",
   "main": "./dist/index.cjs",
   "module": "./dist/index.js",
@@ -40,5 +40,31 @@
   "devDependencies": {
     "@types/node": "^20.0.0"
   },
-  "sideEffects": false
+  "sideEffects": false,
+  "keywords": [
+    "adaptive-loading",
+    "device-aware",
+    "bundle-optimization",
+    "performance",
+    "adaptive-bundle",
+    "vite",
+    "vite-plugin",
+    "rollup",
+    "code-splitting",
+    "chunk-isolation",
+    "build-analysis",
+    "bundle-size",
+    "ci-budgets",
+    "preload-hints"
+  ],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Pizanjavier/adaptive.git",
+    "directory": "packages/vite-plugin"
+  },
+  "homepage": "https://github.com/Pizanjavier/adaptive/tree/main/packages/vite-plugin",
+  "bugs": {
+    "url": "https://github.com/Pizanjavier/adaptive/issues"
+  }
 }

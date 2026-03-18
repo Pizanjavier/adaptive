@@ -4,7 +4,7 @@
     "access": "public"
   },
   "version": "0.1.0",
-  "description": "Device detection engine, scoring, and tier resolution",
+  "description": "Lightweight device detection engine — hardware scoring, tier resolution, and caching for adaptive loading. Zero dependencies, ~3KB gzipped.",
   "type": "module",
   "main": "./dist/index.cjs",
   "module": "./dist/index.js",
@@ -51,5 +51,30 @@
     "typecheck": "tsc --noEmit",
     "clean": "rm -rf dist"
   },
-  "sideEffects": false
+  "sideEffects": false,
+  "keywords": [
+    "adaptive-loading",
+    "device-aware",
+    "bundle-optimization",
+    "performance",
+    "adaptive-bundle",
+    "device-detection",
+    "hardware-scoring",
+    "tier-resolution",
+    "client-hints",
+    "navigator-api",
+    "device-memory",
+    "cpu-cores",
+    "gpu-detection"
+  ],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Pizanjavier/adaptive.git",
+    "directory": "packages/core"
+  },
+  "homepage": "https://github.com/Pizanjavier/adaptive/tree/main/packages/core",
+  "bugs": {
+    "url": "https://github.com/Pizanjavier/adaptive/issues"
+  }
 }

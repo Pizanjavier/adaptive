@@ -4,7 +4,7 @@
     "access": "public"
   },
   "version": "0.1.0",
-  "description": "Browser overlay and dev server dashboard for Adaptive — debug and simulate device tiers",
+  "description": "Browser overlay and dev server dashboard for Adaptive — inspect device tier, probe values, boundary decisions, and simulate tiers in real time.",
   "type": "module",
   "main": "./dist/index.cjs",
   "module": "./dist/index.js",
@@ -37,5 +37,28 @@
   "devDependencies": {
     "@adaptive-bundle/core": "workspace:*"
   },
-  "sideEffects": false
+  "sideEffects": false,
+  "keywords": [
+    "adaptive-loading",
+    "device-aware",
+    "bundle-optimization",
+    "performance",
+    "adaptive-bundle",
+    "devtools",
+    "developer-tools",
+    "debugging",
+    "browser-overlay",
+    "tier-simulator",
+    "vite-dashboard"
+  ],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Pizanjavier/adaptive.git",
+    "directory": "packages/devtools"
+  },
+  "homepage": "https://github.com/Pizanjavier/adaptive/tree/main/packages/devtools",
+  "bugs": {
+    "url": "https://github.com/Pizanjavier/adaptive/issues"
+  }
 }

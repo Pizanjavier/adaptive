@@ -4,7 +4,7 @@
     "access": "public"
   },
   "version": "0.1.0",
-  "description": "Svelte adapter for Adaptive — adaptive() API and stores",
+  "description": "Svelte adapter for adaptive loading — ship different components to high and low-end devices with adaptive() stores and context.",
   "type": "module",
   "main": "./dist/index.cjs",
   "module": "./dist/index.js",
@@ -39,5 +39,29 @@
     "@adaptive-bundle/core": "workspace:*",
     "svelte": "^4.2.0"
   },
-  "sideEffects": false
+  "sideEffects": false,
+  "keywords": [
+    "adaptive-loading",
+    "device-aware",
+    "bundle-optimization",
+    "performance",
+    "adaptive-bundle",
+    "svelte",
+    "sveltekit",
+    "lazy-loading",
+    "conditional-rendering",
+    "code-splitting",
+    "stores",
+    "readable-store"
+  ],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Pizanjavier/adaptive.git",
+    "directory": "packages/svelte"
+  },
+  "homepage": "https://github.com/Pizanjavier/adaptive/tree/main/packages/svelte",
+  "bugs": {
+    "url": "https://github.com/Pizanjavier/adaptive/issues"
+  }
 }

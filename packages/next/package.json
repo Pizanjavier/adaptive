@@ -4,7 +4,7 @@
     "access": "public"
   },
   "version": "0.1.0",
-  "description": "Next.js integration for Adaptive — Webpack plugin for device-aware bundle optimization",
+  "description": "Next.js plugin for device-aware bundle optimization — Webpack integration for chunk splitting by device tier, reuses adaptive analysis engine.",
   "type": "module",
   "main": "./dist/index.cjs",
   "module": "./dist/index.js",
@@ -42,5 +42,29 @@
     "@adaptive-bundle/react": "workspace:*",
     "@adaptive-bundle/vite-plugin": "workspace:*"
   },
-  "sideEffects": false
+  "sideEffects": false,
+  "keywords": [
+    "adaptive-loading",
+    "device-aware",
+    "bundle-optimization",
+    "performance",
+    "adaptive-bundle",
+    "nextjs",
+    "next",
+    "webpack",
+    "ssr",
+    "server-side-rendering",
+    "chunk-splitting",
+    "react-server-components"
+  ],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Pizanjavier/adaptive.git",
+    "directory": "packages/next"
+  },
+  "homepage": "https://github.com/Pizanjavier/adaptive/tree/main/packages/next",
+  "bugs": {
+    "url": "https://github.com/Pizanjavier/adaptive/issues"
+  }
 }

@@ -441,6 +441,24 @@ pnpm typecheck
 pnpm lint
 ```
 
+## How Adaptive Compares
+
+The adaptive loading pattern was [validated by Google Chrome Labs in 2019](https://web.dev/adaptive-loading-cds-2019/) but never shipped as production tooling. Existing solutions provide pieces of the puzzle but not a complete system:
+
+|                           | Adaptive           | react-adaptive-hooks | UA parsing libs | Manual `if(isMobile)` |
+| ------------------------- | ------------------ | -------------------- | --------------- | --------------------- |
+| Build-time analysis       | Yes — automatic    | No                   | No              | No                    |
+| Chunk isolation guarantee | Yes — per tier     | No                   | No              | No                    |
+| Device hardware scoring   | Yes — 5 probes     | Partial — raw hooks  | UA string only  | Manual                |
+| Framework adapters        | React, Vue, Svelte | React only           | None            | Manual                |
+| Meta-framework support    | Next.js, Nuxt      | No                   | No              | No                    |
+| STB/CTV support           | First-class        | No                   | Partial         | Manual                |
+| CI budget enforcement     | Yes                | No                   | No              | No                    |
+| Runtime size              | ~3KB gzipped       | ~8KB                 | Varies          | 0                     |
+| Maintained (2026)         | Yes                | Abandoned (2020)     | Varies          | N/A                   |
+
+**Key difference:** Adaptive is a _build intelligence tool_ that happens to include a runtime. Others are runtime-only libraries that require manual build configuration. Adaptive analyzes your dependency graph, isolates tier-specific code into separate chunks, and guarantees no high-tier code leaks into low-tier bundles — all automatically.
+
 ## Size Budgets
 
 | Package                   | Budget        | Enforced     |

@@ -4,7 +4,7 @@
     "access": "public"
   },
   "version": "0.1.0",
-  "description": "Nuxt module for Adaptive — auto-injects Vite plugin + Nitro middleware",
+  "description": "Nuxt module for device-aware bundle optimization — auto-configures Vite plugin and Nitro middleware for server-side tier resolution.",
   "type": "module",
   "main": "./dist/index.cjs",
   "module": "./dist/index.js",
@@ -40,5 +40,29 @@
     "@adaptive-bundle/core": "workspace:*",
     "@adaptive-bundle/vite-plugin": "workspace:*"
   },
-  "sideEffects": false
+  "sideEffects": false,
+  "keywords": [
+    "adaptive-loading",
+    "device-aware",
+    "bundle-optimization",
+    "performance",
+    "adaptive-bundle",
+    "nuxt",
+    "nuxt3",
+    "nitro",
+    "ssr",
+    "server-side-rendering",
+    "client-hints",
+    "middleware"
+  ],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Pizanjavier/adaptive.git",
+    "directory": "packages/nuxt"
+  },
+  "homepage": "https://github.com/Pizanjavier/adaptive/tree/main/packages/nuxt",
+  "bugs": {
+    "url": "https://github.com/Pizanjavier/adaptive/issues"
+  }
 }
