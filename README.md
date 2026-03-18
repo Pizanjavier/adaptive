@@ -8,6 +8,7 @@
 
 **Ship 60-90% less JavaScript to devices that can't handle it.**
 
+[![npm](https://img.shields.io/npm/v/@adaptive-bundle/core?label=npm&color=cb3837)](https://www.npmjs.com/package/@adaptive-bundle/core)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 [![TypeScript](https://img.shields.io/badge/TypeScript-strict-3178C6.svg)](https://www.typescriptlang.org/)
 [![Core Size](https://img.shields.io/badge/core-~3KB_gzipped-brightgreen.svg)](#size-budgets)
