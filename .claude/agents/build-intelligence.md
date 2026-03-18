@@ -46,7 +46,6 @@ You are the specialist for `@adaptive/vite-plugin` — the build-time analysis a
 
 - `npx adaptive analyze` — report without full build
 - `npx adaptive init <path>` — scaffold adaptive boundary
-- `npx adaptive init --top=N` — batch scaffold highest-impact
 - `npx adaptive simulate <path>` — what-if analysis, no file changes
 - `npx adaptive report` — generate from cached build data
 - `npx adaptive validate` — check boundary correctness

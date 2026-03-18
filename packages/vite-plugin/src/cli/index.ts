@@ -11,7 +11,6 @@ Usage: adaptive <command> [options]
 Commands:
   analyze              Run bundle analysis without full build
   init <path>          Scaffold an adaptive boundary
-  init --top=N         Batch scaffold highest-impact boundaries
   simulate <path>      What-if analysis without file changes
   report               Generate report from cached build data
   validate             Check boundary correctness

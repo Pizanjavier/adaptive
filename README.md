@@ -1,8 +1,36 @@
+<div align="center">
+
+<br />
+
+<img src="adaptive.png" alt="Adaptive" width="140" />
+
 # Adaptive
 
-**Intelligent bundle optimization for device-aware web apps.**
+**Ship 60-90% less JavaScript to devices that can't handle it.**
 
-Install one Vite plugin. See exactly where your bundle hurts low-end devices. Fix it incrementally with one-line adaptive boundaries. Ship 60-90% less JS to devices that can't handle it.
+[![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+[![TypeScript](https://img.shields.io/badge/TypeScript-strict-3178C6.svg)](https://www.typescriptlang.org/)
+[![Core Size](https://img.shields.io/badge/core-~3KB_gzipped-brightgreen.svg)](#size-budgets)
+[![Zero Dependencies](https://img.shields.io/badge/core_deps-zero-brightgreen.svg)](#architecture)
+
+[Getting Started](#install) · [Why Adaptive?](#why) · [API Reference](docs/configuration.md) · [CLI](docs/cli.md) · [STB/CTV Guide](docs/stb-ctv.md)
+
+</div>
+
+---
+
+### Highlights
+
+- **Zero code changes to start** — install the Vite plugin, get a full bundle analysis report on every build
+- **One-line adaptive boundaries** — wrap heavy components, ship lightweight alternatives to low-end devices
+- **Build-time intelligence** — chunk isolation guarantees no high-tier code leaks into low-tier bundles
+- **< 50ms detection** — hardware scoring with fast-path optimization, cached across sessions
+- **~3KB runtime** — zero-dependency core with framework adapters for React, Vue, and Svelte
+- **Meta-framework support** — first-class Next.js and Nuxt integrations
+- **STB/CTV ready** — the only adaptive loading tool with set-top box and connected TV support
+- **100% local** — zero telemetry, zero network calls, GDPR-compatible by design
+
+---
 
 ## Why
 
@@ -421,6 +449,12 @@ pnpm lint
 | `@adaptive/vue`    | 2KB gzipped   | CI blocks PR |
 | `@adaptive/svelte` | 1.5KB gzipped | CI blocks PR |
 
+---
+
 ## License
 
 MIT
+
+<div align="center">
+<sub>Built for the devices your users actually have.</sub>
+</div>

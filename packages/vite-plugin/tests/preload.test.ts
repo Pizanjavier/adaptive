@@ -11,6 +11,7 @@ function makeConfig(overrides: Partial<ResolvedConfig> = {}): ResolvedConfig {
     preloadHints: true,
     ssrDefaultTier: 'low',
     sizeOverrides: {},
+    devtools: false,
     ...overrides,
   };
 }

@@ -23,6 +23,7 @@ const baseConfig: ResolvedConfig = {
   preloadHints: false,
   ssrDefaultTier: 'low',
   sizeOverrides: {},
+  devtools: false,
 };
 
 describe('findOpportunities', () => {

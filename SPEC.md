@@ -138,7 +138,7 @@ Performance impact (low-tier devices):
   Parse time saved:  ~1.6s on median low-end device
   Download saved:    ~2.1s on 3G connection
 
-Quick start: npx adaptive init --top=3  (scaffold the 3 highest-impact boundaries)
+Quick start: npx adaptive init           (scaffold an adaptive boundary)
 ────────────────────────────────
 ```
 
@@ -1139,29 +1139,9 @@ Expected savings: 475KB for low-tier devices
 Next: implement the lite variant in DashboardLite.tsx
 ```
 
-#### `npx adaptive init --top=N`
+#### Batch scaffolding (future)
 
-Batch scaffolding: analyzes the entire project and scaffolds adaptive boundaries for the N highest-impact components in one command. Generates all lite variants, adaptive wrappers, and a summary of total expected savings. This is the fastest path from Level 0 (analysis) to Level 1 (first boundaries).
-
-```bash
-$ npx adaptive init --top=3
-
-Analyzing project...
-  Found 7 components with heavy exclusive dependencies.
-  Scaffolding top 3 by impact:
-
-  1. src/components/MapView.tsx (230KB savings)
-     Created: MapViewLite.tsx, MapView.adaptive.tsx
-
-  2. src/components/Charts.tsx (156KB savings)
-     Created: ChartsLite.tsx, Charts.adaptive.tsx
-
-  3. src/components/Editor.tsx (89KB savings)
-     Created: EditorLite.tsx, Editor.adaptive.tsx
-
-Total expected savings: 475KB for low-tier devices
-Next: implement the lite variants (search for TODO markers)
-```
+> **Deferred:** Batch init (`npx adaptive init --top=N`) may be added in a future release based on user demand. For now, run `npx adaptive init` once per component.
 
 #### `npx adaptive report`
 
@@ -1285,7 +1265,7 @@ Adaptive provides first-class integration with the frameworks where SSR + perfor
 
 ### 9.1 Next.js
 
-Next.js uses Webpack by default, not Vite. Adaptive provides a separate Next.js plugin that hooks into Webpack's chunk splitting. **Turbopack support:** When Next.js is configured with Turbopack (`next dev --turbo`), the analysis engine uses Turbopack's module graph API instead of Webpack's. The `@adaptive/next` plugin detects the active bundler automatically — developers don't need separate configuration. Chunk isolation uses each bundler's native splitting API. Turbopack support is targeted for Phase 3 alongside the initial Webpack integration.
+Next.js uses Webpack by default, not Vite. Adaptive provides a separate Next.js plugin that hooks into Webpack's chunk splitting. **Turbopack support:** Deferred until Turbopack stabilizes its module graph plugin API. The current implementation targets Webpack only, which covers all production Next.js builds. Turbopack support may be added in a future release when the API is stable.
 
 ```ts
 // next.config.js
@@ -1453,20 +1433,19 @@ test('renders static image on low-tier devices', async () => {
 
 #### Integration Testing Chunk Isolation
 
-The Vite plugin provides a programmatic API for verifying chunk isolation in CI:
+The Vite plugin exports analysis functions that can be used to verify chunk isolation in CI:
 
 ```ts
-import { analyzeAdaptiveBoundaries } from '@adaptive/vite-plugin/testing';
+import { scanAllModules, analyzeBoundaries } from '@adaptive/vite-plugin';
 
-test('high variant dependencies do not leak into low variant chunks', async () => {
-  const analysis = await analyzeAdaptiveBoundaries('./vite.config.ts');
+test('high variant dependencies do not leak into low variant chunks', () => {
+  // Use the analysis functions with your build's module graph
+  // to verify exclusive dependencies don't overlap between tiers
+  for (const analysis of analyses) {
+    const highIds = new Set(analysis.exclusiveHighDeps.map((d) => d.id));
+    const lowIds = new Set(analysis.exclusiveLowDeps.map((d) => d.id));
 
-  for (const boundary of analysis.boundaries) {
-    const highDeps = new Set(boundary.high.exclusiveDependencies);
-    const lowDeps = new Set(boundary.low.exclusiveDependencies);
-
-    // No overlap between exclusive dependencies
-    const overlap = [...highDeps].filter((d) => lowDeps.has(d));
+    const overlap = [...highIds].filter((d) => lowIds.has(d));
     expect(overlap).toEqual([]);
   }
 });

@@ -196,7 +196,6 @@ This document tracks all user requests and AI outputs during development, servin
   - Combined transforms (calls + inline blocks in same file)
 - **Spec audit findings** — implementation is ~95% complete:
   - CLI commands (analyze, simulate, report, validate) are functional but limited without Vite build context
-  - Batch init (`--top=N`) not implemented
   - All core features, adapters, and meta-framework integrations are spec-compliant
 - All **193 tests** pass across 8 packages
 
