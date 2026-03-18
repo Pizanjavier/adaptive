@@ -8,6 +8,8 @@ import { createPreloadHtmlTransform } from './preload.js';
 import { transformForTargetTier } from './target-tier.js';
 import { generateReports } from './reports/index.js';
 import { checkBudgets } from './budget.js';
+import { stripDevtoolsImport } from './strip-devtools.js';
+import { createDevMiddleware } from './server/middleware.js';
 
 /**
  * Vite plugin for device-aware bundle optimization.
@@ -25,13 +27,15 @@ export function adaptive(userConfig?: AdaptivePluginConfig): Plugin {
   const config = normalizeConfig(userConfig);
   let analyses: BoundaryAnalysis[] = [];
   let opportunities: Opportunity[] = [];
+  let isBuild = false;
 
   return {
     name: 'adaptive',
     enforce: 'pre',
 
     configResolved(resolvedConfig) {
-      if (resolvedConfig.command === 'build') {
+      isBuild = resolvedConfig.command === 'build';
+      if (isBuild) {
         const existing = resolvedConfig.build.rollupOptions?.output;
         if (existing && !Array.isArray(existing)) {
           const prev = existing.manualChunks;
@@ -43,6 +47,17 @@ export function adaptive(userConfig?: AdaptivePluginConfig): Plugin {
             return chunksFn(id, meta) ?? undefined;
           };
         }
+      }
+    },
+
+    configureServer(server) {
+      if (config.devtools) {
+        server.middlewares.use(
+          createDevMiddleware(
+            { getAnalyses: () => analyses, getOpportunities: () => opportunities },
+            server,
+          ),
+        );
       }
     },
 
@@ -62,6 +77,10 @@ export function adaptive(userConfig?: AdaptivePluginConfig): Plugin {
 
     transform(code, id) {
       if (id.includes('node_modules')) return null;
+      if (isBuild) {
+        const stripped = stripDevtoolsImport(code, id);
+        if (stripped) return stripped;
+      }
       return transformForTargetTier(code, id, config);
     },
 

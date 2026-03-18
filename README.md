@@ -38,6 +38,17 @@ export default defineConfig({
 
 Build your app -- the plugin outputs a bundle analysis report with heavy dependencies, potential savings, and suggested adaptive boundaries ranked by impact.
 
+## Demo App
+
+A multi-page React dashboard showcasing every adaptive pattern — animated metrics (framer-motion), interactive 3D scene (Three.js), rich markdown editor, canvas charts — all with lightweight low-tier alternatives. See the full difference by adding `?adaptive_tier=low` to any URL.
+
+```bash
+cd fixtures/demo-app
+pnpm dev   # http://localhost:5173
+```
+
+See the **[Demo App README](fixtures/demo-app/README.md)** for architecture details and what each page demonstrates.
+
 ## Level 1: Adaptive Boundaries
 
 ### Exclusion Pattern
@@ -53,7 +64,6 @@ const MapView = adaptive({
   layout: { width: '100%', aspectRatio: '16/9' },
 });
 
-// Use like a normal component
 <MapView center={[40, -74]} zoom={12} />;
 ```
 
@@ -68,6 +78,21 @@ const Editor = adaptive({
   name: 'editor',
 });
 ```
+
+### Three-Tier Mode
+
+Opt-in per boundary by adding a `medium` variant:
+
+```tsx
+const Chart = adaptive({
+  high: () => import('./AnimatedChart'),
+  medium: () => import('./StaticChart'),
+  low: () => import('./ChartTable'),
+  thresholds: { high: 0.65, low: 0.35 },
+});
+```
+
+Score >= 0.65 loads high, < 0.35 loads low, between loads medium.
 
 ### Inline Pattern
 
@@ -122,7 +147,9 @@ const MapView = adaptive({
 <svelte:component this={$MapView} center={[40, -3]} zoom={12} />
 ```
 
-## Hooks
+## Hooks, Composables & Stores
+
+### React
 
 ```tsx
 import { useAdaptive, useTier, useDeviceProfile, useNetworkAware } from '@adaptive/react';
@@ -131,11 +158,11 @@ function MyComponent() {
   const { tier, shouldDefer, profile } = useAdaptive();
   const tier = useTier(); // 'high' | 'low' | 'medium'
   const profile = useDeviceProfile(); // full DeviceProfile
-  const { shouldDefer } = useNetworkAware(); // true on 2g/slow-2g
+  const { shouldDefer, effectiveType } = useNetworkAware();
 }
 ```
 
-Wrap your app in `AdaptiveProvider` to cache the profile across hooks:
+Wrap your app in `AdaptiveProvider` to cache the profile across hooks and prevent re-detection on every hook call:
 
 ```tsx
 import { AdaptiveProvider } from '@adaptive/react';
@@ -145,36 +172,173 @@ import { AdaptiveProvider } from '@adaptive/react';
 </AdaptiveProvider>;
 ```
 
-## Configuration
+### Vue
 
 ```ts
-import { configure } from '@adaptive/core';
+import { useAdaptive, useTier, useDeviceProfile, useNetworkAware } from '@adaptive/vue';
 
-configure({
-  threshold: 0.5, // score threshold for high/low split
-  cacheTTL: 30_000, // cache detection for 30s
-  weights: {
-    cpuCores: 0.35,
-    memory: 0.25,
-    gpu: 0.2,
-    screen: 0.1,
-    touchPoints: 0.1,
+const { tier, shouldDefer, profile } = useAdaptive();
+const tier = useTier();
+const profile = useDeviceProfile();
+const { shouldDefer, effectiveType } = useNetworkAware();
+```
+
+### Svelte
+
+```ts
+import { tierStore, deviceProfileStore, networkAwareStore } from '@adaptive/svelte';
+
+$tierStore; // 'high' | 'low' | 'medium'
+$deviceProfileStore; // full DeviceProfile
+$networkAwareStore; // { shouldDefer, effectiveType }
+```
+
+## How Detection Works
+
+The detection engine scores device capability using 5 hardware probes:
+
+| Probe         | Weight | Source                          |
+| ------------- | ------ | ------------------------------- |
+| CPU cores     | 0.35   | `navigator.hardwareConcurrency` |
+| Device memory | 0.35   | `navigator.deviceMemory`        |
+| GPU tier      | 0.15   | WebGL renderer string heuristic |
+| Screen        | 0.10   | Resolution x device pixel ratio |
+| Touch points  | 0.05   | `navigator.maxTouchPoints`      |
+
+The composite score (0-1) determines the tier: >= 0.5 is high, < 0.5 is low. When probes are unavailable (e.g., `deviceMemory` on Firefox), weights redistribute automatically.
+
+A **fast-path** covers ~70% of devices without expensive probing: Data Saver on forces low; cached tier reuses prior result; `deviceMemory` <= 2GB goes low immediately; >= 8GB with 8+ cores goes high immediately. Full scoring runs only for ambiguous devices.
+
+**Asymmetric hysteresis** prevents tier flipping near threshold boundaries: low-to-high requires the score to exceed threshold by 0.12; high-to-low requires falling below by 0.08.
+
+Detection completes in **< 50ms** on any device. Results are cached in localStorage with a 7-day TTL and auto-invalidate when configuration changes.
+
+## Network Awareness
+
+Network conditions are tracked **separately** from hardware tier. A high-end phone on 2G should defer heavy loading:
+
+```tsx
+const { shouldDefer, effectiveType } = useNetworkAware();
+// shouldDefer: true on 2g/slow-2g
+// effectiveType: '4g' | '3g' | '2g' | 'slow-2g'
+```
+
+When **Data Saver** is active, the tier is forced to `low` regardless of hardware capability.
+
+## STB/CTV Support
+
+Adaptive is the only adaptive loading tool with first-class STB/CTV support. Three strategies available depending on your build pipeline:
+
+- **`targetTier`** — Build per platform, tree-shake unused variant at compile time. Zero runtime cost. Recommended for per-platform builds.
+- **`deviceMap`** — Single build, multiple platforms. Static lookup table bypasses scoring.
+- **Custom probe providers** — Feed native platform APIs (Tizen, webOS, Sky) into the scoring engine.
+
+See the full **[STB/CTV Platform Guide](docs/stb-ctv.md)**.
+
+Quick example for per-platform builds:
+
+```ts
+adaptive({
+  targetTier: process.env.PLATFORM === 'foxtel' ? 'low' : 'high',
+});
+```
+
+```bash
+PLATFORM=foxtel pnpm build   # low-tier-only bundle, no @adaptive/core
+```
+
+## CLI
+
+The plugin ships a CLI for standalone analysis, scaffolding, and validation:
+
+```bash
+npx adaptive analyze             # scan source for boundaries
+npx adaptive init src/Heavy.tsx  # scaffold adaptive boundary
+npx adaptive simulate src/X.tsx  # what-if analysis
+npx adaptive report              # regenerate from cached data
+npx adaptive validate            # check boundary correctness (CI-friendly)
+```
+
+See the full **[CLI Reference](docs/cli.md)**.
+
+## DevTools
+
+### Browser Overlay
+
+```ts
+import('@adaptive/devtools').then((d) => d.init());
+```
+
+Shows current tier, score, confidence, all probe values, reasoning chain, per-boundary decisions, and a tier simulator dropdown. Automatically stripped from production builds.
+
+### Dev Server Dashboard
+
+Visit `http://localhost:5173/__adaptive` during development. Shows boundary table with sizes, dependency trees, and a tier simulator with HMR-based live reload.
+
+## Build Reports & Budgets
+
+The plugin generates build reports in three formats:
+
+```ts
+adaptive({
+  report: true,
+  reportFormat: 'console', // default — also 'html' or 'json'
+  reportDir: './adaptive-reports',
+});
+```
+
+- **Console** — boundary summary, sizes, savings, opportunities ranked by impact
+- **HTML** — interactive dashboard for stakeholders with trend charts via `history.json`
+- **JSON** — structured data for CI pipelines and custom tooling
+
+### Budget Enforcement
+
+Fail or warn the build when bundles exceed size targets:
+
+```ts
+adaptive({
+  budget: {
+    maxLowTierBundle: 150_000, // max bytes for low-tier total
+    maxHighVariant: 80_000, // max bytes per high variant
+    minSavingsPercent: 10, // minimum savings to justify a boundary
+    enforce: 'error', // 'error' fails build, 'warn' logs only
   },
 });
 ```
 
+## Error Recovery
+
+Boundaries automatically retry failed imports after 1 second. If a high-tier variant fails to load, the low variant is loaded as fallback. The `onError` callback lets you hook into error tracking:
+
+```tsx
+adaptive({
+  high: () => import('./RichEditor'),
+  low: () => import('./BasicEditor'),
+  onError: (error, boundaryName) => analytics.track('adaptive_error', { error, boundaryName }),
+});
+```
+
+## Configuration
+
+Basic setup works out of the box. For full options — scoring weights, thresholds, hysteresis, caching, network behavior, SSR defaults, and more — see the **[Configuration Reference](docs/configuration.md)**.
+
 ## Server-Side Detection
+
+Resolve tier from Client Hints headers to avoid the 50ms client-side detection cost entirely:
 
 ```ts
 import { resolveTierFromHeaders } from '@adaptive/core/server';
 
-const tier = resolveTierFromHeaders(request.headers);
-// Uses Device-Memory and Sec-CH-UA-Mobile client hints
+// Express / any Node.js server
+app.use((req, res, next) => {
+  const tier = resolveTierFromHeaders(req.headers);
+  // Uses Sec-CH-Device-Memory and Sec-CH-UA-Mobile headers
+});
 ```
 
-## Testing
+Works in any JS server environment including edge runtimes (Cloudflare Workers, Vercel Edge Functions, Deno Deploy). Zero DOM dependencies.
 
-Force a specific tier in tests:
+## Testing
 
 ```ts
 import { setForcedTier, clearForcedTier } from '@adaptive/core/testing';
@@ -185,21 +349,7 @@ afterEach(() => clearForcedTier());
 
 Or via URL parameter: `?adaptive_tier=low`
 
-## Vite Plugin Options
-
-```ts
-adaptive({
-  report: true, // enable build reports
-  reportFormat: 'console', // 'console' | 'html' | 'json'
-  reportDir: './adaptive-reports', // output directory
-  preloadHints: true, // inject preload tags
-  budget: {
-    maxLowTierBundle: 150_000, // max bytes for low-tier bundle
-    minSavingsPercent: 10, // minimum savings to justify boundary
-    enforce: 'error', // 'error' | 'warn'
-  },
-});
-```
+Use `npx adaptive validate` in CI to check boundary correctness.
 
 ## Next.js
 
@@ -212,7 +362,6 @@ module.exports = withAdaptive({
     report: true,
     reportFormat: 'console',
   },
-  // ...rest of your Next.js config
 });
 ```
 
@@ -231,7 +380,11 @@ export default defineNuxtConfig({
 });
 ```
 
-The Nuxt module auto-injects the Vite plugin and registers server middleware that resolves device tier from Client Hints headers and sets an `adaptive_tier_hint` cookie.
+The Nuxt module auto-injects the Vite plugin and registers Nitro server middleware that resolves device tier from Client Hints headers and sets an `adaptive_tier_hint` cookie.
+
+## Privacy
+
+Adaptive is **100% local, zero-telemetry, zero-network**. No data ever leaves the user's device or build environment. This is a hard architectural constraint, not a configurable option. Detection uses only local browser APIs (`navigator.hardwareConcurrency`, `navigator.deviceMemory`, WebGL). Cached data lives in `localStorage` (or memory-only for strict consent policies via `cacheStorage: 'memory'`). Compatible with GDPR, ePrivacy, and operator-specific STB/CTV privacy requirements.
 
 ## Architecture
 
@@ -244,7 +397,10 @@ packages/
   svelte/        @adaptive/svelte         adaptive() + stores + context
   next/          @adaptive/next           Next.js Webpack plugin (reuses vite-plugin analysis)
   nuxt/          @adaptive/nuxt           Nuxt module + Nitro middleware
+  devtools/      @adaptive/devtools       Browser overlay + dev dashboard
 ```
+
+Chunk isolation guarantee: **no code from the high variant leaks into the low-tier bundle**. Exclusive dependencies are isolated into separate chunks. Shared dependencies stay in common chunks without duplication.
 
 ## Development
 

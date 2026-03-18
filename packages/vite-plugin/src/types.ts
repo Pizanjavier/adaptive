@@ -15,6 +15,7 @@ export interface AdaptivePluginConfig {
   targetTier?: 'high' | 'low';
   sizeOverrides?: Record<string, number>;
   budget?: BudgetConfig;
+  devtools?: boolean;
 }
 
 export interface ResolvedConfig {
@@ -27,6 +28,7 @@ export interface ResolvedConfig {
   targetTier?: 'high' | 'low';
   sizeOverrides: Record<string, number>;
   budget?: BudgetConfig;
+  devtools: boolean;
 }
 
 export interface AdaptiveBoundary {

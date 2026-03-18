@@ -140,3 +140,108 @@ This document tracks all user requests and AI outputs during development, servin
 - Updated `CLAUDE.md` architecture reference, `README.md` with Next.js and Nuxt setup examples
 - All **209 tests** pass across 7 packages (core: 60, vite-plugin: 59, react: 19, vue: 20, svelte: 13, next: 25, nuxt: 13)
 - Key architecture: **reuse over duplication** — Next.js package imports analysis engine from vite-plugin, only chunk isolation is Webpack-specific
+
+### #013 — Phase 4 Implementation (@adaptive/devtools)
+
+**Date:** 2026-03-18
+**Request:** Implement `@adaptive/devtools` — browser overlay + Vite dev server dashboard for debugging and simulating device tiers.
+**Output:**
+
+- **@adaptive/devtools** (6 src files, 3 test files):
+  - `overlay/state.ts` — `collectState()` reads `getDeviceProfile()` from core, scans `[data-adaptive]` DOM elements for boundary decisions
+  - `overlay/styles.ts` — Shadow DOM CSS: dark theme (#0f172a), glassmorphism, tier color coding (high=green, medium=amber, low=red)
+  - `overlay/render.ts` — Pure HTML renderer: tier badge, probes table, reasoning chain, boundaries list, tier simulator dropdown
+  - `overlay/controls.ts` — Event handlers: collapse/expand, drag-to-move, tier simulator calls `setForcedTier()`/`clearForcedTier()`
+  - `overlay/create.ts` — Shadow DOM mount with `MutationObserver` for auto-refresh, HMR event listener
+  - `index.ts` — Public API: `init(config?)`, `destroy()`, SSR-safe, idempotent
+  - 17 tests passing
+- **Vite plugin extensions** (3 new files, 3 files modified):
+  - `server/middleware.ts` — Dev middleware: `/__adaptive` dashboard, `/__adaptive/api/analysis` JSON, `/__adaptive/api/simulate` HMR tier forcing
+  - `server/dashboard.ts` — Standalone HTML dashboard: boundary table with sizes, collapsible dependency trees, tier simulator, HMR auto-refresh
+  - `strip-devtools.ts` — Production stripping: replaces `import('@adaptive/devtools')` with no-op Promise
+  - Modified `index.ts`: added `configureServer` hook + `stripDevtoolsImport` in transform
+  - Modified `types.ts`: added `devtools?: boolean` to config
+  - Modified `config.ts`: default `devtools: true`
+  - 9 new tests (6 strip-devtools + 3 server middleware)
+- All **235 tests** pass across 8 packages (core: 60, vite-plugin: 68, react: 19, vue: 20, svelte: 13, next: 25, nuxt: 13, devtools: 17)
+
+### #014 — Configuration Documentation + targetTier Implementation
+
+**Date:** 2026-03-18
+**Request:** Document all config options from SPEC.md (README was missing targetTier, deviceMap, probeProviders, hysteresis, network, caching, per-boundary options). Then implement proper targetTier support and audit spec vs implementation.
+**Output:**
+
+- Created `docs/configuration.md` — comprehensive configuration reference covering:
+  - Vite plugin options (analysis, reporting, targetTier, CI budgets, size overrides)
+  - Core runtime options (weights, thresholds, hysteresis, network, caching)
+  - STB/CTV configuration (deviceMap, detectPlatform, custom probe providers, CTV weight recommendations)
+  - Per-boundary options (exclusion, two-variant, three-tier, layout hints)
+  - Framework-specific config (Next.js, Nuxt)
+  - Server-side detection
+- Updated `README.md` — slimmed Configuration section to quick examples + link to full reference, targetTier + PLATFORM env pattern visible
+- **Rewrote `target-tier.ts`** — proper implementation:
+  - Replaces `adaptive()` calls with **static imports** (no runtime wrapper, no dynamic import)
+  - Handles two-variant pattern (`high`/`low`) and exclusion pattern (`component`) for high tier
+  - Transforms `Adaptive.High`/`Adaptive.Low` JSX: unwraps matching tier children, replaces non-matching with `{null}`
+  - Cleans up unused `@adaptive/*` imports after transformation
+  - Gracefully skips exclusion pattern for low tier (lowFallback is JSX, not extractable)
+- **Rewrote `target-tier.test.ts`** — 14 tests covering:
+  - Two-variant static import replacement (high/low)
+  - Exclusion pattern static import (high tier)
+  - Exclusion pattern skip (low tier, JSX fallback)
+  - Multiple adaptive() calls in one file
+  - Adaptive.High/Low JSX unwrapping and removal
+  - JSX blocks with attributes
+  - Import cleanup (removes unused, preserves hooks)
+  - Combined transforms (calls + inline blocks in same file)
+- **Spec audit findings** — implementation is ~95% complete:
+  - CLI commands (analyze, simulate, report, validate) are functional but limited without Vite build context
+  - Batch init (`--top=N`) not implemented
+  - All core features, adapters, and meta-framework integrations are spec-compliant
+- All **193 tests** pass across 8 packages
+
+### #015 — Comprehensive README + Documentation Overhaul
+
+**Date:** 2026-03-18
+**Request:** Audit README against SPEC.md for missing features. Add missing content, create docs/ files for detailed sections.
+**Output:**
+
+- **Rewrote `README.md`** (261 → 415 lines) — added 12 new sections:
+  - "Three-Tier Mode" with medium variant example
+  - "Hooks, Composables & Stores" expanded with Vue composables + Svelte stores
+  - "How Detection Works" — 5 probes, weights, fast-path, hysteresis, caching
+  - "Network Awareness" — shouldDefer, effectiveType, Data Saver override
+  - "STB/CTV Support" — three strategies overview + link to guide
+  - "CLI" — all 5 commands + link to reference
+  - "DevTools" — browser overlay + dev server dashboard
+  - "Build Reports & Budgets" — three formats + budget enforcement
+  - "Error Recovery" — retry, cross-tier fallback, onError callback
+  - "Privacy" — zero-telemetry guarantee, GDPR compliance
+  - Chunk isolation guarantee in Architecture section
+  - DevTools package in Architecture diagram
+- **Created `docs/cli.md`** (103 lines) — full CLI reference: analyze, init, simulate, report, validate with flags and examples
+- **Created `docs/stb-ctv.md`** (155 lines) — STB/CTV platform guide: targetTier, deviceMap, custom probes, CTV weight recommendations, strategy comparison table
+
+### #016 — Demo App Showcase Rewrite
+
+**Date:** 2026-03-18
+**Request:** Evolve the fixture demo app from a basic test fixture into a polished multi-page showcase. Add real heavy packages (Three.js, framer-motion), multiple pages, clean professional design, and a demo README. Avoid AI-typical aesthetics.
+**Output:**
+
+- **Complete rewrite** of `fixtures/demo-app/` — from 12 files/229 lines to 24 files with proper architecture
+- **3 pages** with react-router-dom:
+  - **Dashboard** (`/`) — animated metrics (framer-motion) + canvas chart with eased transitions
+  - **3D Explorer** (`/3d`) — Three.js interactive torus knot with PBR materials, orbit controls, floating rings
+  - **Editor** (`/editor`) — rich markdown editor with formatting toolbar + side-by-side live preview
+- **Low-tier alternatives** for every boundary:
+  - Static HTML cards (no animation library)
+  - HTML table with progress bars (no canvas)
+  - Static SVG wireframe (~2KB vs ~600KB Three.js)
+  - Plain textarea with word count (no markdown engine)
+- **Real heavy dependencies:** three (~600KB), @react-three/fiber, @react-three/drei, framer-motion (~100KB)
+- **Design:** Clean light theme, Inter font, sidebar navigation, card-based layout, CSS custom properties, no external CSS framework
+- **Heavy modules:** particles.ts (constellation effect), chart-engine.ts (animated area chart), geometry.ts (3D wireframe math), editor-engine.ts (markdown formatting + rendering)
+- **Error handling:** Three.js scene wrapped in error boundary for WebGL-unavailable environments
+- **Created `fixtures/demo-app/README.md`** — architecture, pages, patterns, dependencies, features
+- **Updated parent `README.md`** — added Demo App section with link
+- All **193 tests** pass across 8 packages

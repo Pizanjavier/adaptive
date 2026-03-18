@@ -1,47 +1,22 @@
-import { Suspense } from 'react';
-import ExclusionChart from './components/ExclusionChart';
-import VariantEditor from './components/VariantEditor';
-import InlineDemo from './components/InlineDemo';
-import HooksDemo from './components/HooksDemo';
-
-const sectionStyle: React.CSSProperties = {
-  border: '1px solid #ddd',
-  borderRadius: 8,
-  padding: 16,
-  marginBottom: 16,
-};
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { Sidebar } from './components/layout/Sidebar';
+import Dashboard from './pages/Dashboard';
+import Exploration from './pages/Exploration';
+import EditorPage from './pages/Editor';
 
 export default function App() {
   return (
-    <div style={{ maxWidth: 720, margin: '0 auto', padding: 24, fontFamily: 'system-ui' }}>
-      <h1>Adaptive Demo</h1>
-      <p style={{ color: '#666' }}>
-        Add <code>?adaptive_tier=low</code> to the URL to simulate a low-tier device.
-      </p>
-
-      <section style={sectionStyle}>
-        <h2>1. Hooks</h2>
-        <HooksDemo />
-      </section>
-
-      <section style={sectionStyle}>
-        <h2>2. Inline Tier Boundaries</h2>
-        <InlineDemo />
-      </section>
-
-      <section style={sectionStyle}>
-        <h2>3. Exclusion Pattern (Chart)</h2>
-        <Suspense fallback={<p>Loading chart…</p>}>
-          <ExclusionChart />
-        </Suspense>
-      </section>
-
-      <section style={sectionStyle}>
-        <h2>4. Variant Pattern (Editor)</h2>
-        <Suspense fallback={<p>Loading editor…</p>}>
-          <VariantEditor />
-        </Suspense>
-      </section>
-    </div>
+    <BrowserRouter>
+      <div className="app">
+        <Sidebar />
+        <main className="main">
+          <Routes>
+            <Route path="/" element={<Dashboard />} />
+            <Route path="/3d" element={<Exploration />} />
+            <Route path="/editor" element={<EditorPage />} />
+          </Routes>
+        </main>
+      </div>
+    </BrowserRouter>
   );
 }

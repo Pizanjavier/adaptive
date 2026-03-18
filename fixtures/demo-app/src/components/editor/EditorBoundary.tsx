@@ -1,9 +1,9 @@
 import { adaptive } from '@adaptive/react';
 
-const VariantEditor = adaptive({
+const EditorBoundary = adaptive({
   high: () => import('./RichEditor'),
   low: () => import('./BasicEditor'),
-  name: 'VariantEditor',
+  name: 'Editor',
 });
 
-export default VariantEditor;
+export default EditorBoundary;

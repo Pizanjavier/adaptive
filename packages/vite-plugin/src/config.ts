@@ -8,6 +8,7 @@ const DEFAULTS: ResolvedConfig = {
   preloadHints: true,
   ssrDefaultTier: 'low',
   sizeOverrides: {},
+  devtools: true,
 };
 
 export function normalizeConfig(userConfig: AdaptivePluginConfig = {}): ResolvedConfig {

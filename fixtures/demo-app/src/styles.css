@@ -1,0 +1,386 @@
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+:root {
+  --bg: #f5f6f8;
+  --surface: #ffffff;
+  --surface-hover: #f9fafb;
+  --border: #e5e7eb;
+  --text: #1e293b;
+  --text-secondary: #64748b;
+  --accent: #2563eb;
+  --accent-light: #eff6ff;
+  --tier-high: #059669;
+  --tier-high-bg: #ecfdf5;
+  --tier-low: #d97706;
+  --tier-low-bg: #fffbeb;
+  --radius: 8px;
+  --shadow: 0 1px 3px rgba(0, 0, 0, 0.06), 0 1px 2px rgba(0, 0, 0, 0.04);
+  --sidebar-width: 240px;
+}
+
+body {
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Layout */
+.app {
+  display: flex;
+  min-height: 100vh;
+}
+
+.main {
+  flex: 1;
+  margin-left: var(--sidebar-width);
+  padding: 32px;
+  max-width: 1200px;
+}
+
+/* Sidebar */
+.sidebar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: var(--sidebar-width);
+  height: 100vh;
+  background: #1e293b;
+  color: #e2e8f0;
+  display: flex;
+  flex-direction: column;
+  z-index: 10;
+}
+
+.sidebar-brand {
+  padding: 24px 20px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.sidebar-brand h1 {
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.sidebar-brand p {
+  font-size: 12px;
+  color: #94a3b8;
+  margin-top: 2px;
+}
+
+.sidebar-nav {
+  padding: 12px 8px;
+  flex: 1;
+}
+
+.sidebar-nav a {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: 6px;
+  color: #94a3b8;
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 500;
+  transition: background 0.15s, color 0.15s;
+}
+
+.sidebar-nav a:hover {
+  background: rgba(255, 255, 255, 0.06);
+  color: #e2e8f0;
+}
+
+.sidebar-nav a.active {
+  background: rgba(37, 99, 235, 0.15);
+  color: #60a5fa;
+}
+
+.sidebar-footer {
+  padding: 16px 20px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+/* Cards */
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+}
+
+.card-header {
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.card-header h2 {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.card-body {
+  padding: 20px;
+}
+
+/* Grid */
+.grid {
+  display: grid;
+  gap: 20px;
+}
+
+.grid-2 {
+  grid-template-columns: 1fr 1fr;
+}
+
+/* Tier badge */
+.tier-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.tier-badge.high {
+  background: var(--tier-high-bg);
+  color: var(--tier-high);
+}
+
+.tier-badge.low {
+  background: var(--tier-low-bg);
+  color: var(--tier-low);
+}
+
+/* Page header */
+.page-header {
+  margin-bottom: 24px;
+}
+
+.page-header h1 {
+  font-size: 24px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.page-header p {
+  color: var(--text-secondary);
+  font-size: 14px;
+  margin-top: 4px;
+}
+
+/* Label */
+.label {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* Canvas container */
+.canvas-wrap {
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+  border-radius: var(--radius);
+  background: #fafafa;
+}
+
+.canvas-wrap canvas {
+  display: block;
+  width: 100%;
+}
+
+/* Static fallback styling */
+.static-fallback {
+  padding: 20px;
+}
+
+.static-fallback table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+.static-fallback th,
+.static-fallback td {
+  text-align: left;
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--border);
+}
+
+.static-fallback th {
+  font-weight: 600;
+  color: var(--text-secondary);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* Editor styles */
+.editor-toolbar {
+  display: flex;
+  gap: 4px;
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--border);
+  background: var(--bg);
+}
+
+.editor-toolbar button {
+  padding: 4px 10px;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  background: var(--surface);
+  color: var(--text);
+  font-size: 13px;
+  cursor: pointer;
+  transition: background 0.1s;
+}
+
+.editor-toolbar button:hover {
+  background: var(--surface-hover);
+}
+
+.editor-content {
+  min-height: 200px;
+  padding: 16px;
+  font-size: 14px;
+  line-height: 1.7;
+  outline: none;
+}
+
+.editor-preview {
+  padding: 16px;
+  font-size: 14px;
+  line-height: 1.7;
+  border-top: 1px solid var(--border);
+  background: var(--bg);
+}
+
+.editor-preview h2 {
+  font-size: 18px;
+  margin-bottom: 8px;
+}
+
+.editor-preview code {
+  background: #e5e7eb;
+  padding: 1px 5px;
+  border-radius: 3px;
+  font-size: 13px;
+}
+
+.editor-preview blockquote {
+  border-left: 3px solid var(--accent);
+  padding-left: 12px;
+  color: var(--text-secondary);
+  margin: 8px 0;
+}
+
+.editor-preview li {
+  margin-left: 20px;
+}
+
+.editor-stats {
+  padding: 8px 16px;
+  border-top: 1px solid var(--border);
+  display: flex;
+  gap: 16px;
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+/* 3D scene */
+.scene-container {
+  height: 400px;
+  border-radius: var(--radius);
+  overflow: hidden;
+  background: #0f172a;
+}
+
+.scene-static {
+  height: 400px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f1f5f9;
+  border-radius: var(--radius);
+}
+
+/* Device info */
+.device-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 12px;
+}
+
+.device-item {
+  padding: 12px;
+  background: var(--bg);
+  border-radius: 6px;
+}
+
+.device-item .value {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.device-item .label {
+  margin-top: 2px;
+}
+
+/* Metrics */
+.metrics-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+}
+
+.metric-card {
+  padding: 20px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+}
+
+.metric-card .value {
+  font-size: 28px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.metric-card .label {
+  margin-top: 4px;
+}
+
+.metric-card .change {
+  font-size: 12px;
+  font-weight: 500;
+  margin-top: 8px;
+}
+
+.metric-card .change.positive {
+  color: var(--tier-high);
+}
+
+.metric-card .change.negative {
+  color: #dc2626;
+}
