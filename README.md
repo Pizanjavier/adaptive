@@ -14,7 +14,7 @@
 [![Core Size](https://img.shields.io/badge/core-~3KB_gzipped-brightgreen.svg)](#size-budgets)
 [![Zero Dependencies](https://img.shields.io/badge/core_deps-zero-brightgreen.svg)](#architecture)
 
-[Getting Started](#install) · [Why Adaptive?](#why) · [API Reference](docs/configuration.md) · [CLI](docs/cli.md) · [STB/CTV Guide](docs/stb-ctv.md)
+[Getting Started](#install) · [Live Demo](https://pizanjavier.github.io/adaptive/) · [Why Adaptive?](#why) · [API Reference](docs/configuration.md) · [CLI](docs/cli.md) · [STB/CTV Guide](docs/stb-ctv.md)
 
 </div>
 
@@ -69,9 +69,12 @@ Build your app -- the plugin outputs a bundle analysis report with heavy depende
 
 ## Demo App
 
-A multi-page React dashboard showcasing every adaptive pattern — animated metrics (framer-motion), interactive 3D scene (Three.js), rich markdown editor, canvas charts — all with lightweight low-tier alternatives. See the full difference by adding `?adaptive_tier=low` to any URL.
+A multi-page React dashboard showcasing every adaptive pattern — animated metrics (framer-motion), interactive 3D scene (Three.js), rich markdown editor, canvas charts — all with lightweight low-tier alternatives.
+
+**[Try the live demo](https://pizanjavier.github.io/adaptive/)** — add `?adaptive_tier=low` to any URL to see the low-tier experience.
 
 ```bash
+# Or run locally:
 cd fixtures/demo-app
 pnpm dev   # http://localhost:5173
 ```
