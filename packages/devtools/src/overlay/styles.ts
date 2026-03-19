@@ -149,6 +149,19 @@ export const OVERLAY_STYLES = `
   color: #38bdf8;
 }
 
+.loading-tag {
+  font-size: 10px;
+  padding: 1px 5px;
+  border-radius: 3px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.loading-eager { background: rgba(16, 185, 129, 0.2); color: #34d399; }
+.loading-lazy { background: rgba(245, 158, 11, 0.2); color: #fbbf24; }
+.loading-viewport { background: rgba(99, 102, 241, 0.2); color: #818cf8; }
+
 .reasoning-item {
   font-size: 11px;
   color: #94a3b8;

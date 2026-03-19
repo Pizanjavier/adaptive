@@ -1,21 +1,24 @@
-import { readable, type Readable } from 'svelte/store';
+import { readable, writable, type Readable } from 'svelte/store';
 import { getDeviceProfile, type Tier } from '@adaptive-bundle/core';
 import { loadWithFallback } from './error-recovery.js';
+import { preloadImport } from './loading.js';
 
 type ImportFn<T> = () => Promise<{ default: T }>;
+
+export interface LazyReadable<T> extends Readable<T | null> {
+  load: () => void;
+}
 
 interface BaseConfig {
   name?: string;
   loading?: 'eager' | 'lazy' | 'viewport';
   onError?: (error: Error, boundaryName: string) => void;
-  /** Build-time only: capabilities required to include this boundary */
   requires?: string[];
 }
 
 interface ExclusionConfig<T> extends BaseConfig {
   component: ImportFn<T>;
   lowFallback?: null;
-  /** Build-time only: fallback import when required capabilities are missing */
   capabilityFallback?: ImportFn<T>;
 }
 
@@ -24,7 +27,6 @@ interface VariantConfig<T> extends BaseConfig {
   low: ImportFn<T>;
   medium?: ImportFn<T>;
   thresholds?: { high?: number; low?: number };
-  /** Build-time only: fallback import when required capabilities are missing */
   capabilityFallback?: ImportFn<T>;
 }
 
@@ -52,6 +54,22 @@ function resolveTierFromScore(
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function adaptive<T = any>(config: AdaptiveConfig<T>): Readable<T | null> {
   const name = config.name ?? 'adaptive';
+  const loading = config.loading ?? 'viewport';
+
+  if (loading === 'lazy') {
+    return createLazyReadable(config, name);
+  }
+
+  if (loading === 'eager' && isExclusion(config)) {
+    config = { ...config, component: preloadImport(config.component) };
+  } else if (loading === 'eager' && !isExclusion(config)) {
+    config = {
+      ...config,
+      high: preloadImport(config.high),
+      low: preloadImport(config.low),
+      ...(config.medium ? { medium: preloadImport(config.medium) } : {}),
+    };
+  }
 
   return readable<T | null>(null, (set) => {
     if (isExclusion(config)) {
@@ -60,6 +78,23 @@ export function adaptive<T = any>(config: AdaptiveConfig<T>): Readable<T | null>
       loadVariant(config, name, set);
     }
   });
+}
+
+function createLazyReadable<T>(config: AdaptiveConfig<T>, name: string): LazyReadable<T> {
+  const { set, subscribe } = writable<T | null>(null);
+  let loaded = false;
+
+  function load(): void {
+    if (loaded) return;
+    loaded = true;
+    if (isExclusion(config)) {
+      loadExclusion(config, name, set);
+    } else {
+      loadVariant(config, name, set);
+    }
+  }
+
+  return { subscribe, load };
 }
 
 function loadExclusion<T>(

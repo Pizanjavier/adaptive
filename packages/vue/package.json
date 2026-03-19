@@ -3,7 +3,7 @@
   "publishConfig": {
     "access": "public"
   },
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Vue adapter for adaptive loading — ship different components to high and low-end devices with adaptive(), composables, and AdaptiveHigh/Low.",
   "type": "module",
   "main": "./dist/index.cjs",

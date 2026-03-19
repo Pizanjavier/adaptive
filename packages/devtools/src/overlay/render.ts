@@ -45,8 +45,12 @@ function renderBoundaries(state: OverlayState): string {
   return state.boundaries
     .map((b) => {
       const cls = b.hasError ? 'variant-error' : `variant-${b.loadedVariant}`;
+      const loadingTag = b.loading
+        ? `<span class="loading-tag loading-${b.loading}">${esc(b.loading)}</span>`
+        : '';
       return `<div class="boundary-item">
         <span class="boundary-name">${esc(b.name)}</span>
+        ${loadingTag}
         <span class="boundary-variant ${cls}">${esc(b.loadedVariant)}</span>
       </div>`;
     })

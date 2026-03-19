@@ -179,6 +179,64 @@ const MapView = adaptive({
 <svelte:component this={$MapView} center={[40, -3]} zoom={12} />
 ```
 
+## Loading Strategies
+
+Control when adaptive boundaries begin loading their imports:
+
+| Strategy             | Behavior                                      | Use case                        |
+| -------------------- | --------------------------------------------- | ------------------------------- |
+| `viewport` (default) | Load on first render                          | General purpose                 |
+| `eager`              | Preload import immediately at definition time | Critical above-the-fold content |
+| `lazy`               | Defer import until element enters viewport    | Heavy below-the-fold content    |
+
+```tsx
+// React — preload critical metrics immediately
+const Metrics = adaptive({
+  high: () => import('./AnimatedMetrics'),
+  low: () => import('./StaticMetrics'),
+  loading: 'eager',
+});
+
+// React — defer heavy 3D scene until scrolled into view
+const Scene = adaptive({
+  high: () => import('./ThreeScene'),
+  low: () => import('./StaticScene'),
+  loading: 'lazy',
+});
+```
+
+```vue
+<!-- Vue -->
+<script setup>
+const Chart = adaptive({
+  high: () => import('./AnimatedChart.vue'),
+  low: () => import('./StaticChart.vue'),
+  loading: 'lazy',
+});
+</script>
+```
+
+```svelte
+<!-- Svelte — lazy with viewport action -->
+<script>
+import { adaptive, viewportAction } from '@adaptive-bundle/svelte';
+
+const Scene = adaptive({
+  high: () => import('./ThreeScene.svelte'),
+  low: () => import('./StaticScene.svelte'),
+  loading: 'lazy',
+});
+</script>
+
+<div use:viewportAction={() => Scene.load()}>
+  {#if $Scene}
+    <svelte:component this={$Scene} />
+  {/if}
+</div>
+```
+
+SSR safe: when `IntersectionObserver` is unavailable, `lazy` falls back to default behavior.
+
 ## Hooks, Composables & Stores
 
 ### React

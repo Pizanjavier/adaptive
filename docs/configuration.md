@@ -363,21 +363,40 @@ const Editor = adaptive({
 });
 ```
 
-| Option               | Type                                  | Default      | Description                                     |
-| -------------------- | ------------------------------------- | ------------ | ----------------------------------------------- |
-| `component`          | `() => Promise<{default: Component}>` | —            | Heavy component (exclusion pattern)             |
-| `high`               | `() => Promise<{default: Component}>` | —            | High-tier variant (two-variant pattern)         |
-| `low`                | `() => Promise<{default: Component}>` | —            | Low-tier variant (two-variant pattern)          |
-| `medium`             | `() => Promise<{default: Component}>` | —            | Medium-tier variant (opt-in)                    |
-| `lowFallback`        | `ReactElement \| null`                | —            | Rendered on low-tier (exclusion pattern)        |
-| `fallback`           | `ReactElement`                        | —            | Loading skeleton                                |
-| `layout`             | `{ width?, height?, aspectRatio? }`   | —            | CLS-preventing layout hints                     |
-| `name`               | `string`                              | —            | Boundary identifier for reports/devtools        |
-| `loading`            | `'eager' \| 'lazy' \| 'viewport'`     | `'viewport'` | Loading strategy                                |
-| `thresholds`         | `{ high?: number, low?: number }`     | —            | Override global tier thresholds                 |
-| `onError`            | `(error, name) => void`               | —            | Error callback                                  |
-| `requires`           | `string[]`                            | —            | Capabilities required (build-time pruning)      |
-| `capabilityFallback` | `() => Promise<{default: Component}>` | —            | Fallback when required capabilities are missing |
+| Option        | Type                                  | Default      | Description                                |
+| ------------- | ------------------------------------- | ------------ | ------------------------------------------ |
+| `component`   | `() => Promise<{default: Component}>` | —            | Heavy component (exclusion pattern)        |
+| `high`        | `() => Promise<{default: Component}>` | —            | High-tier variant (two-variant pattern)    |
+| `low`         | `() => Promise<{default: Component}>` | —            | Low-tier variant (two-variant pattern)     |
+| `medium`      | `() => Promise<{default: Component}>` | —            | Medium-tier variant (opt-in)               |
+| `lowFallback` | `ReactElement \| null`                | —            | Rendered on low-tier (exclusion pattern)   |
+| `fallback`    | `ReactElement`                        | —            | Loading skeleton                           |
+| `layout`      | `{ width?, height?, aspectRatio? }`   | —            | CLS-preventing layout hints                |
+| `name`        | `string`                              | —            | Boundary identifier for reports/devtools   |
+| `loading`     | `'eager' \| 'lazy' \| 'viewport'`     | `'viewport'` | Loading strategy (see below)               |
+| `thresholds`  | `{ high?: number, low?: number }`     | —            | Override global tier thresholds            |
+| `onError`     | `(error, name) => void`               | —            | Error callback                             |
+| `requires`    | `string[]`                            | —            | Capabilities required (build-time pruning) |
+
+#### Loading Strategy Details
+
+| Strategy             | Behavior                                                                                                      | When to use                                                                |
+| -------------------- | ------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------- |
+| `viewport` (default) | Load on first render via `React.lazy` / `defineAsyncComponent` / readable store                               | General purpose — works for most boundaries                                |
+| `eager`              | Preload the import immediately when `adaptive()` is called (definition time)                                  | Critical above-the-fold content that must render instantly                 |
+| `lazy`               | Defer the import until the boundary element enters the viewport (IntersectionObserver with 200px root margin) | Heavy below-the-fold content (Three.js scenes, rich editors, large charts) |
+
+**SSR safety:** When `IntersectionObserver` is unavailable (SSR, older browsers), `lazy` falls back to `viewport` behavior.
+
+**Svelte note:** With `loading: 'lazy'`, `adaptive()` returns a `LazyReadable<T>` (extends `Readable<T | null>`) with a `.load()` method. Use the `viewportAction` Svelte action to trigger loading when the element scrolls into view:
+
+```svelte
+<div use:viewportAction={() => store.load()}>
+  {#if $store}<svelte:component this={$store} />{/if}
+</div>
+```
+
+| `capabilityFallback` | `() => Promise<{default: Component}>` | — | Fallback when required capabilities are missing |
 
 ---
 

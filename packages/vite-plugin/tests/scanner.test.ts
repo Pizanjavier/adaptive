@@ -122,6 +122,31 @@ const Widget = adaptive({
     expect(results[0].capabilityFallbackImport).toBeUndefined();
   });
 
+  it('extracts loading prop from adaptive() calls', () => {
+    const source = `
+const Scene = adaptive({
+  high: () => import('./SceneHigh'),
+  low: () => import('./SceneLow'),
+  loading: 'lazy',
+});
+`;
+    const results = scanSource(source, 'src/Scene.tsx');
+    expect(results).toHaveLength(1);
+    expect(results[0].loading).toBe('lazy');
+  });
+
+  it('boundaries without loading have undefined loading', () => {
+    const source = `
+const Widget = adaptive({
+  high: () => import('./WidgetHigh'),
+  low: () => import('./WidgetLow'),
+});
+`;
+    const results = scanSource(source, 'src/Widget.tsx');
+    expect(results).toHaveLength(1);
+    expect(results[0].loading).toBeUndefined();
+  });
+
   it('handles medium variant', () => {
     const source = `
 const Widget = adaptive({

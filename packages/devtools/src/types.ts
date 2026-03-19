@@ -11,6 +11,7 @@ export interface BoundaryDecision {
   name: string;
   loadedVariant: string;
   hasError: boolean;
+  loading?: string;
 }
 
 export interface OverlayState {

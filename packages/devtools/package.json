@@ -3,7 +3,7 @@
   "publishConfig": {
     "access": "public"
   },
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Browser overlay and dev server dashboard for Adaptive — inspect device tier, probe values, boundary decisions, and simulate tiers in real time.",
   "type": "module",
   "main": "./dist/index.cjs",

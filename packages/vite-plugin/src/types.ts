@@ -49,6 +49,7 @@ export interface AdaptiveBoundary {
   lowFallbackImport?: string;
   requires?: string[];
   capabilityFallbackImport?: string;
+  loading?: 'eager' | 'lazy' | 'viewport';
 }
 
 export interface DependencyInfo {

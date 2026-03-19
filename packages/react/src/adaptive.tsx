@@ -1,14 +1,15 @@
-import React, { lazy, Suspense, type ComponentType, type ReactElement } from 'react';
+import { lazy, Suspense, type ComponentType, type ReactElement } from 'react';
 import { getDeviceProfile, type Tier } from '@adaptive-bundle/core';
 import { loadWithFallback } from './error-recovery.js';
+import {
+  resolveTierFromScore,
+  layoutStyle,
+  makeErrorComponent,
+  type LayoutConfig,
+} from './shared.js';
+import { preloadImport, ViewportWrapper } from './loading.js';
 
 type ImportFn<P> = () => Promise<{ default: ComponentType<P> }>;
-
-interface LayoutConfig {
-  width?: string;
-  height?: string;
-  aspectRatio?: string;
-}
 
 interface BaseConfig {
   fallback?: ReactElement;
@@ -40,44 +41,6 @@ function isExclusion<P>(c: AdaptiveConfig<P>): c is ExclusionConfig<P> {
   return 'component' in c;
 }
 
-function resolveTierFromScore(
-  score: number,
-  thresholds?: { high?: number; low?: number },
-  hasMedium?: boolean,
-): Tier {
-  if (thresholds || hasMedium) {
-    const high = thresholds?.high ?? 0.65;
-    const low = thresholds?.low ?? 0.35;
-    if (score >= high) return 'high';
-    if (score <= low) return 'low';
-    return 'medium';
-  }
-  return score >= 0.5 ? 'high' : 'low';
-}
-
-function layoutStyle(layout?: LayoutConfig): React.CSSProperties | undefined {
-  if (!layout) return undefined;
-  return {
-    width: layout.width,
-    height: layout.height,
-    aspectRatio: layout.aspectRatio,
-  };
-}
-
-function makeErrorComponent(
-  fallback: ReactElement | undefined,
-  name: string,
-): ComponentType<unknown> {
-  return function ErrorFallback() {
-    if (!fallback) return <div data-adaptive={name} data-adaptive-error />;
-    return (
-      <div data-adaptive={name} data-adaptive-error>
-        {fallback}
-      </div>
-    );
-  };
-}
-
 /**
  * Create an adaptive component with tier-based loading.
  * @example
@@ -99,7 +62,6 @@ export function adaptive<P extends Record<string, unknown>>(
   config: AdaptiveConfig<P>,
 ): ComponentType<P> {
   const boundaryName = config.name ?? 'adaptive';
-
   if (isExclusion(config)) {
     return buildExclusion(config, boundaryName);
   }
@@ -110,8 +72,10 @@ function buildExclusion<P extends Record<string, unknown>>(
   config: ExclusionConfig<P>,
   name: string,
 ): ComponentType<P> {
+  const importFn = config.loading === 'eager' ? preloadImport(config.component) : config.component;
+
   const LazyComponent = lazy(() =>
-    loadWithFallback(config.component).catch((err) => {
+    loadWithFallback(importFn).catch((err) => {
       config.onError?.(err as Error, name);
       return { default: makeErrorComponent(config.fallback, name) as ComponentType<P> };
     }),
@@ -119,21 +83,41 @@ function buildExclusion<P extends Record<string, unknown>>(
 
   function AdaptiveExclusion(props: P) {
     const profile = getDeviceProfile();
+    const loadingAttr = config.loading ?? 'viewport';
     if (profile.tier === 'low') {
       return (
-        <div data-adaptive={name} style={layoutStyle(config.layout)}>
+        <div
+          data-adaptive={name}
+          data-adaptive-loading={loadingAttr}
+          style={layoutStyle(config.layout)}
+        >
           {config.lowFallback}
         </div>
       );
     }
-    return (
-      <div data-adaptive={name} style={layoutStyle(config.layout)}>
+
+    const content = (
+      <div
+        data-adaptive={name}
+        data-adaptive-loading={loadingAttr}
+        style={layoutStyle(config.layout)}
+      >
         <Suspense fallback={config.fallback ?? null}>
           {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
           <LazyComponent {...(props as any)} />
         </Suspense>
       </div>
     );
+
+    if (config.loading === 'lazy') {
+      return (
+        <ViewportWrapper fallback={config.fallback} layout={config.layout} name={name}>
+          {content}
+        </ViewportWrapper>
+      );
+    }
+
+    return content;
   }
 
   AdaptiveExclusion.displayName = `Adaptive(${name})`;
@@ -145,6 +129,12 @@ function buildVariant<P extends Record<string, unknown>>(
   name: string,
 ): ComponentType<P> {
   const lazyCache = new Map<Tier, ReturnType<typeof lazy>>();
+
+  if (config.loading === 'eager') {
+    preloadImport(config.high);
+    preloadImport(config.low);
+    if (config.medium) preloadImport(config.medium);
+  }
 
   function getLazy(tier: Tier) {
     if (lazyCache.has(tier)) return lazyCache.get(tier)!;
@@ -174,14 +164,29 @@ function buildVariant<P extends Record<string, unknown>>(
     const tier = resolveTierFromScore(profile.score, config.thresholds, !!config.medium);
     const LazyComponent = getLazy(tier);
 
-    return (
-      <div data-adaptive={name} style={layoutStyle(config.layout)}>
+    const loadingAttr = config.loading ?? 'viewport';
+    const content = (
+      <div
+        data-adaptive={name}
+        data-adaptive-loading={loadingAttr}
+        style={layoutStyle(config.layout)}
+      >
         <Suspense fallback={config.fallback ?? null}>
           {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
           <LazyComponent {...(props as any)} />
         </Suspense>
       </div>
     );
+
+    if (config.loading === 'lazy') {
+      return (
+        <ViewportWrapper fallback={config.fallback} layout={config.layout} name={name}>
+          {content}
+        </ViewportWrapper>
+      );
+    }
+
+    return content;
   }
 
   AdaptiveVariant.displayName = `Adaptive(${name})`;

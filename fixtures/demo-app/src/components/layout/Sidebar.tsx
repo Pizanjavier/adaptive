@@ -51,6 +51,17 @@ export function Sidebar() {
           </svg>
           Capabilities
         </NavLink>
+
+        <NavLink to="/impact">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+            <path d="M2 14L2 2" stroke="currentColor" strokeWidth="1.5" />
+            <path d="M2 14H14" stroke="currentColor" strokeWidth="1.5" />
+            <path d="M5 10V14" stroke="currentColor" strokeWidth="1.5" />
+            <path d="M8 7V14" stroke="currentColor" strokeWidth="1.5" />
+            <path d="M11 4V14" stroke="currentColor" strokeWidth="1.5" />
+          </svg>
+          Impact
+        </NavLink>
       </nav>
 
       <div className="sidebar-footer">

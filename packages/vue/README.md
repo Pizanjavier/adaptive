@@ -63,6 +63,28 @@ import { AdaptiveHigh, AdaptiveLow } from '@adaptive-bundle/vue';
 </template>
 ```
 
+## Loading Strategies
+
+| Strategy             | Behavior                                                                 |
+| -------------------- | ------------------------------------------------------------------------ |
+| `viewport` (default) | Load on first render                                                     |
+| `eager`              | Preload at definition time                                               |
+| `lazy`               | Defer until element enters viewport (IntersectionObserver, 200px margin) |
+
+```ts
+const Metrics = adaptive({
+  high: () => import('./AnimatedMetrics.vue'),
+  low: () => import('./StaticMetrics.vue'),
+  loading: 'eager',
+});
+
+const Scene = adaptive({
+  high: () => import('./ThreeScene.vue'),
+  low: () => import('./StaticScene.vue'),
+  loading: 'lazy',
+});
+```
+
 ## Composables
 
 ```ts

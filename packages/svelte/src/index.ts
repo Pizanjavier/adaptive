@@ -1,4 +1,6 @@
 export { adaptive } from './adaptive.js';
+export type { LazyReadable } from './adaptive.js';
+export { viewportAction } from './loading.js';
 export { setAdaptiveContext, getAdaptiveContext } from './context.js';
 export {
   createAdaptiveStore,

@@ -52,6 +52,43 @@ const Chart = adaptive({
 });
 ```
 
+## Loading Strategies
+
+| Strategy             | Behavior                                                             |
+| -------------------- | -------------------------------------------------------------------- |
+| `viewport` (default) | Load on first render                                                 |
+| `eager`              | Preload at definition time                                           |
+| `lazy`               | Returns a `LazyReadable` — import deferred until `.load()` is called |
+
+```svelte
+<script>
+import { adaptive, viewportAction } from '@adaptive-bundle/svelte';
+
+// Eager: preload immediately
+const Metrics = adaptive({
+  high: () => import('./AnimatedMetrics.svelte'),
+  low: () => import('./StaticMetrics.svelte'),
+  loading: 'eager',
+});
+
+// Lazy: defer until scrolled into view
+const Scene = adaptive({
+  high: () => import('./ThreeScene.svelte'),
+  low: () => import('./StaticScene.svelte'),
+  loading: 'lazy',
+});
+</script>
+
+<!-- Use viewportAction to trigger lazy loading -->
+<div use:viewportAction={() => Scene.load()}>
+  {#if $Scene}
+    <svelte:component this={$Scene} />
+  {/if}
+</div>
+```
+
+The `viewportAction` Svelte action uses `IntersectionObserver` with a 200px root margin. SSR safe: calls `loadFn` immediately when `IntersectionObserver` is unavailable.
+
 ## Stores
 
 ```ts

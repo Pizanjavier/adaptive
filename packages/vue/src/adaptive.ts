@@ -1,14 +1,25 @@
-import { defineAsyncComponent, defineComponent, h, type Component, type VNode } from 'vue';
+import {
+  defineAsyncComponent,
+  defineComponent,
+  h,
+  ref,
+  onMounted,
+  onUnmounted,
+  type Component,
+  type VNode,
+} from 'vue';
 import { getDeviceProfile, type Tier } from '@adaptive-bundle/core';
 import { loadWithFallback } from './error-recovery.js';
-
-type ImportFn = () => Promise<{ default: Component }>;
-
-interface LayoutConfig {
-  width?: string;
-  height?: string;
-  aspectRatio?: string;
-}
+import {
+  resolveTierFromScore,
+  layoutStyle,
+  makeErrorComponent,
+  unwrap,
+  isVNode,
+  type ImportFn,
+  type LayoutConfig,
+} from './shared.js';
+import { preloadImport, observeViewport } from './loading.js';
 
 interface BaseConfig {
   fallback?: Component;
@@ -16,9 +27,7 @@ interface BaseConfig {
   name?: string;
   loading?: 'eager' | 'lazy' | 'viewport';
   onError?: (error: Error, boundaryName: string) => void;
-  /** Build-time only: capabilities required to include this boundary */
   requires?: string[];
-  /** Build-time only: fallback import when required capabilities are missing */
   capabilityFallback?: ImportFn;
 }
 
@@ -40,88 +49,110 @@ function isExclusion(c: AdaptiveConfig): c is ExclusionConfig {
   return 'component' in c;
 }
 
-function resolveTierFromScore(
-  score: number,
-  thresholds?: { high?: number; low?: number },
-  hasMedium?: boolean,
-): Tier {
-  if (thresholds || hasMedium) {
-    const high = thresholds?.high ?? 0.65;
-    const low = thresholds?.low ?? 0.35;
-    if (score >= high) return 'high';
-    if (score <= low) return 'low';
-    return 'medium';
-  }
-  return score >= 0.5 ? 'high' : 'low';
-}
-
-function layoutStyle(layout?: LayoutConfig): Record<string, string> | undefined {
-  if (!layout) return undefined;
-  const style: Record<string, string> = {};
-  if (layout.width) style.width = layout.width;
-  if (layout.height) style.height = layout.height;
-  if (layout.aspectRatio) style['aspect-ratio'] = layout.aspectRatio;
-  return style;
-}
-
-function makeErrorComponent(fallback: Component | undefined, name: string): Component {
-  return defineComponent({
-    name: 'AdaptiveError',
-    render() {
-      return h(
-        'div',
-        { 'data-adaptive': name, 'data-adaptive-error': '' },
-        fallback ? [h(fallback)] : undefined,
-      );
-    },
-  });
-}
-
-function unwrap(mod: { default: Component }): Component {
-  return mod.default;
+function makeLoader(
+  importFn: ImportFn,
+  config: BaseConfig,
+  name: string,
+  fallbackImport?: ImportFn,
+) {
+  const primary = config.loading === 'eager' ? preloadImport(importFn) : importFn;
+  return () =>
+    loadWithFallback(primary, fallbackImport)
+      .then(unwrap)
+      .catch((err) => {
+        config.onError?.(err as Error, name);
+        return makeErrorComponent(config.fallback, name);
+      });
 }
 
 function buildExclusion(config: ExclusionConfig, name: string): Component {
+  const loader = makeLoader(config.component, config, name);
   const AsyncComponent = defineAsyncComponent({
-    loader: () =>
-      loadWithFallback(config.component)
-        .then(unwrap)
-        .catch((err) => {
-          config.onError?.(err as Error, name);
-          return makeErrorComponent(config.fallback, name);
-        }),
+    loader,
     loadingComponent: config.fallback,
   });
+  const loadingAttr = config.loading ?? 'viewport';
 
   return defineComponent({
     name: `Adaptive(${name})`,
     inheritAttrs: false,
     setup(_, { attrs }) {
       const profile = getDeviceProfile();
-      return () => {
-        if (profile.tier === 'low') {
-          return h('div', { 'data-adaptive': name, style: layoutStyle(config.layout) }, [
-            isVNode(config.lowFallback)
-              ? config.lowFallback
-              : config.lowFallback
-                ? h(config.lowFallback as Component)
-                : null,
-          ]);
-        }
-        return h('div', { 'data-adaptive': name, style: layoutStyle(config.layout) }, [
-          h(AsyncComponent, attrs),
-        ]);
-      };
+
+      if (profile.tier === 'low') {
+        return () =>
+          h(
+            'div',
+            {
+              'data-adaptive': name,
+              'data-adaptive-loading': loadingAttr,
+              style: layoutStyle(config.layout),
+            },
+            [
+              isVNode(config.lowFallback)
+                ? config.lowFallback
+                : config.lowFallback
+                  ? h(config.lowFallback as Component)
+                  : null,
+            ],
+          );
+      }
+
+      if (config.loading === 'lazy') {
+        const visible = ref(false);
+        const wrapperRef = ref<HTMLElement | null>(null);
+        let cleanup: (() => void) | undefined;
+
+        onMounted(() => {
+          if (wrapperRef.value) {
+            cleanup = observeViewport(wrapperRef.value, () => {
+              visible.value = true;
+            });
+          }
+        });
+        onUnmounted(() => cleanup?.());
+
+        return () =>
+          h(
+            'div',
+            {
+              ref: wrapperRef,
+              'data-adaptive': name,
+              'data-adaptive-loading': loadingAttr,
+              style: layoutStyle(config.layout),
+            },
+            [
+              visible.value
+                ? h(AsyncComponent, attrs)
+                : config.fallback
+                  ? h(config.fallback)
+                  : null,
+            ],
+          );
+      }
+
+      return () =>
+        h(
+          'div',
+          {
+            'data-adaptive': name,
+            'data-adaptive-loading': loadingAttr,
+            style: layoutStyle(config.layout),
+          },
+          [h(AsyncComponent, attrs)],
+        );
     },
   });
 }
 
-function isVNode(value: unknown): value is VNode {
-  return value !== null && typeof value === 'object' && '__v_isVNode' in (value as object);
-}
-
 function buildVariant(config: VariantConfig, name: string): Component {
   const asyncCache = new Map<Tier, Component>();
+
+  if (config.loading === 'eager') {
+    preloadImport(config.high);
+    preloadImport(config.low);
+    if (config.medium) preloadImport(config.medium);
+  }
 
   function getAsync(tier: Tier): Component {
     if (asyncCache.has(tier)) return asyncCache.get(tier)!;
@@ -131,24 +162,19 @@ function buildVariant(config: VariantConfig, name: string): Component {
       medium: config.medium,
       low: config.low,
     };
-
     const primary = importMap[tier] ?? config.low;
     const fallbackImport = tier === 'low' ? config.high : config.low;
+    const loader = makeLoader(primary, config, name, fallbackImport);
 
     const AsyncComp = defineAsyncComponent({
-      loader: () =>
-        loadWithFallback(primary, fallbackImport)
-          .then(unwrap)
-          .catch((err) => {
-            config.onError?.(err as Error, name);
-            return makeErrorComponent(config.fallback, name);
-          }),
+      loader,
       loadingComponent: config.fallback,
     });
-
     asyncCache.set(tier, AsyncComp);
     return AsyncComp;
   }
+
+  const loadingAttr = config.loading ?? 'viewport';
 
   return defineComponent({
     name: `Adaptive(${name})`,
@@ -158,10 +184,49 @@ function buildVariant(config: VariantConfig, name: string): Component {
       const tier = resolveTierFromScore(profile.score, config.thresholds, !!config.medium);
       const AsyncComponent = getAsync(tier);
 
+      if (config.loading === 'lazy') {
+        const visible = ref(false);
+        const wrapperRef = ref<HTMLElement | null>(null);
+        let cleanup: (() => void) | undefined;
+
+        onMounted(() => {
+          if (wrapperRef.value) {
+            cleanup = observeViewport(wrapperRef.value, () => {
+              visible.value = true;
+            });
+          }
+        });
+        onUnmounted(() => cleanup?.());
+
+        return () =>
+          h(
+            'div',
+            {
+              ref: wrapperRef,
+              'data-adaptive': name,
+              'data-adaptive-loading': loadingAttr,
+              style: layoutStyle(config.layout),
+            },
+            [
+              visible.value
+                ? h(AsyncComponent, attrs)
+                : config.fallback
+                  ? h(config.fallback)
+                  : null,
+            ],
+          );
+      }
+
       return () =>
-        h('div', { 'data-adaptive': name, style: layoutStyle(config.layout) }, [
-          h(AsyncComponent, attrs),
-        ]);
+        h(
+          'div',
+          {
+            'data-adaptive': name,
+            'data-adaptive-loading': loadingAttr,
+            style: layoutStyle(config.layout),
+          },
+          [h(AsyncComponent, attrs)],
+        );
     },
   });
 }

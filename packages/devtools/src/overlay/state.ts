@@ -30,7 +30,8 @@ function scanBoundaries(): BoundaryDecision[] {
     const profile = getDeviceProfile();
     const loadedVariant = hasError ? 'error' : inferVariant(profile.tier);
 
-    decisions.push({ name, loadedVariant, hasError });
+    const loading = el.getAttribute('data-adaptive-loading') ?? undefined;
+    decisions.push({ name, loadedVariant, hasError, loading });
   }
 
   return decisions;

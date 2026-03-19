@@ -384,3 +384,74 @@ body {
 .metric-card .change.negative {
   color: #dc2626;
 }
+
+/* Loading badges */
+.loading-badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.loading-badge.eager {
+  background: rgba(34, 197, 94, 0.15);
+  color: #16a34a;
+}
+
+.loading-badge.lazy {
+  background: rgba(234, 179, 8, 0.15);
+  color: #ca8a04;
+}
+
+.loading-badge.viewport {
+  background: rgba(99, 102, 241, 0.15);
+  color: #6366f1;
+}
+
+/* Impact page */
+.impact-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+.impact-table th,
+.impact-table td {
+  padding: 10px 16px;
+  text-align: left;
+  border-bottom: 1px solid var(--border);
+}
+
+.impact-table th {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--text-secondary);
+}
+
+.impact-summary {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+.impact-stat {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.impact-value {
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--tier-high);
+}
+
+.impact-label {
+  font-size: 12px;
+  color: var(--text-secondary);
+}

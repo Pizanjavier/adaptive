@@ -52,6 +52,12 @@ function extractStringArray(block: string, propName: string): string[] | undefin
   return strings.length > 0 ? strings : undefined;
 }
 
+function extractStringProp(block: string, propName: string): string | undefined {
+  const re = new RegExp(`${propName}\\s*:\\s*['"]([^'"]+)['"]`);
+  const match = re.exec(block);
+  return match?.[1];
+}
+
 function extractPropertyImport(block: string, propName: string): string | undefined {
   const re = new RegExp(`${propName}\\s*:\\s*\\(?\\s*\\)?\\s*=>?`);
   const match = re.exec(block);
@@ -86,6 +92,11 @@ function scanAdaptiveCalls(source: string, filePath: string): AdaptiveBoundary[]
     const lowFallbackImport = extractPropertyImport(block, 'lowFallback');
     const requires = extractStringArray(block, 'requires');
     const capabilityFallbackImport = extractPropertyImport(block, 'capabilityFallback');
+    const loading = extractStringProp(block, 'loading') as
+      | 'eager'
+      | 'lazy'
+      | 'viewport'
+      | undefined;
 
     if (!highImport && !componentImport) continue;
 
@@ -100,6 +111,7 @@ function scanAdaptiveCalls(source: string, filePath: string): AdaptiveBoundary[]
       lowFallbackImport,
       requires,
       capabilityFallbackImport,
+      loading,
     });
   }
 

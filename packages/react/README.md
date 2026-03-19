@@ -68,6 +68,34 @@ function Dashboard() {
 }
 ```
 
+## Loading Strategies
+
+Control when boundary imports are fetched:
+
+| Strategy             | Behavior                                                                 |
+| -------------------- | ------------------------------------------------------------------------ |
+| `viewport` (default) | Load on first render                                                     |
+| `eager`              | Preload at definition time — use for above-the-fold content              |
+| `lazy`               | Defer until element enters viewport (IntersectionObserver, 200px margin) |
+
+```tsx
+// Preload critical content immediately
+const Metrics = adaptive({
+  high: () => import('./AnimatedMetrics'),
+  low: () => import('./StaticMetrics'),
+  loading: 'eager',
+});
+
+// Defer heavy content until scrolled into view
+const Scene = adaptive({
+  high: () => import('./ThreeScene'),
+  low: () => import('./StaticScene'),
+  loading: 'lazy',
+});
+```
+
+SSR safe: when `IntersectionObserver` is unavailable, `lazy` falls back to loading on render.
+
 ## Hooks
 
 ```tsx

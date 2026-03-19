@@ -87,6 +87,20 @@ describe('renderOverlay', () => {
     expect(html).toContain('Reset forced tier');
   });
 
+  it('renders loading strategy tag on boundaries', () => {
+    const state = createState({
+      boundaries: [
+        { name: 'Metrics', loadedVariant: 'high', hasError: false, loading: 'eager' },
+        { name: 'Scene', loadedVariant: 'high', hasError: false, loading: 'lazy' },
+        { name: 'Chart', loadedVariant: 'high', hasError: false },
+      ],
+    });
+    const html = renderOverlay(state);
+    expect(html).toContain('loading-eager');
+    expect(html).toContain('loading-lazy');
+    expect(html).not.toContain('loading-undefined');
+  });
+
   it('escapes HTML in boundary names', () => {
     const state = createState({
       boundaries: [{ name: '<script>xss</script>', loadedVariant: 'high', hasError: false }],

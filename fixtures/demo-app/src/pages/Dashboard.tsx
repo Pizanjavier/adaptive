@@ -11,9 +11,17 @@ export default function Dashboard() {
         <p>Each card below loads a different component based on your device capabilities.</p>
       </div>
 
-      <Suspense fallback={<MetricsSkeleton />}>
-        <Metrics />
-      </Suspense>
+      <div style={{ position: 'relative' }}>
+        <span
+          className="loading-badge eager"
+          style={{ position: 'absolute', top: 8, right: 8, zIndex: 1 }}
+        >
+          eager
+        </span>
+        <Suspense fallback={<MetricsSkeleton />}>
+          <Metrics />
+        </Suspense>
+      </div>
 
       <div className="grid grid-2" style={{ marginTop: 20 }}>
         <div className="card">
